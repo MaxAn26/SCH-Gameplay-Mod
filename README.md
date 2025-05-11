@@ -1,5 +1,10 @@
 # SCH Gameplay Mod
 
+**Game**: Solas City Heroes  
+**Version**: 2.0+ (Require DLC Rise of the succubus)  
+**Mod Type**: BepInEx plugin (DLL injection)  
+**Content**: NSFW (text-based only, no media)
+
 > ⚠️ This project contains mature (NSFW) content in textual form only. It is intended for adults. No visual or audio content of a sexual nature is hosted in this repository.
 
 ## Overview
