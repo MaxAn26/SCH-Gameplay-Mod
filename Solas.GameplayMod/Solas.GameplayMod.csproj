@@ -1,0 +1,94 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latest</LangVersion>
+		<RestoreAdditionalProjectSources>
+		  https://api.nuget.org/v3/index.json;
+		  https://nuget.bepinex.dev/v3/index.json;
+		  https://nuget.samboy.dev/v3/index.json
+		</RestoreAdditionalProjectSources>
+		<RootNamespace>Solas.GameplayMod</RootNamespace>
+		<DebugType>embedded</DebugType>
+		<Platforms>AnyCPU;x64</Platforms>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<MainVersion>1.0</MainVersion>
+		<BuildVersion>$([System.DateTime]::UtcNow.ToString(yy))$([System.DateTime]::UtcNow.DayOfYear.ToString(000))</BuildVersion>
+		<VersionTime>$([System.DateTime]::UtcNow.ToString(HHmm))</VersionTime>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<AssemblyName>Solas.GameplayMod</AssemblyName>
+		<Description>Solas Gameplay Mod</Description>
+		<Product>$(Description)</Product>
+		<Authors>BoL4oNoK</Authors>
+		<Copyright>Copyright © BoL4oNoK $([System.DateTime]::UtcNow.ToString(yyyy))</Copyright>
+		<AssemblyVersion>$(MainVersion).$(BuildVersion).$(VersionTime)</AssemblyVersion>
+		<Version>$(MainVersion).$(BuildVersion)</Version>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+		<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+		<Deterministic>false</Deterministic>
+	</PropertyGroup>
+
+	<ItemDefinitionGroup>
+		<PackageReference>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<Reference>
+			<Private>false</Private>
+		</Reference>
+	</ItemDefinitionGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
+		<PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\BaseMod.Core\BaseMod.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="Assembly-CSharp">
+	    <HintPath>..\Libs\Assembly-CSharp.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Il2Cppmscorlib">
+	    <HintPath>..\Libs\Il2Cppmscorlib.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityEngine.AnimationModule">
+	    <HintPath>..\Libs\UnityEngine.AnimationModule.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityEngine.CoreModule">
+	    <HintPath>..\Libs\UnityEngine.CoreModule.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityEngine.PhysicsModule">
+	    <HintPath>..\Libs\UnityEngine.PhysicsModule.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Models\" />
+	  <Folder Include="Mods\" />
+	  <Folder Include="Patches\" />
+	  <Folder Include="Components\" />
+	</ItemGroup>
+	
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec WorkingDirectory="$(SolutionDir)" Command="mkdir &quot;@Mods/$(TargetName)&quot;&#xD;&#xA;&#xD;&#xA;xcopy &quot;$(TargetDir)*.dll&quot; &quot;@Mods/$(TargetName)&quot; /Y&#xD;&#xA;&#xD;&#xA;if %25errorlevel%25 leq 4 exit 0 else exit %25errorlevel%25" />
+	</Target>
+	
+	<Target Name="PostPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
+		<ItemGroup>
+			<CopySource Include="$(PublishDir)*.dll" />
+		</ItemGroup>
+
+		<MakeDir Directories="$(SolutionDir)@Release\$(AssemblyName)\$(AssemblyName)" />
+		<Copy SourceFiles="@(CopySource)" DestinationFolder="$(SolutionDir)@Release\$(AssemblyName)\$(AssemblyName)" />
+		<!--<Copy SourceFiles="$(ProjectDir)Enemy Mod_Readme.rtf"
+				DestinationFolder="$(SolutionDir)@Release\$(AssemblyName)" />-->
+		<ZipDirectory SourceDirectory="$(SolutionDir)@Release\$(AssemblyName)" DestinationFile="$(SolutionDir)@Release\$(AssemblyName)-$(AssemblyVersion).zip" Overwrite="true" />
+	</Target>
+</Project>
