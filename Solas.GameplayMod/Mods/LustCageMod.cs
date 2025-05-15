@@ -37,21 +37,21 @@ internal class LustCageMod {
                 new ConfigDescription( "Player can't escape from interaction and should end it by cumming or using counter", new AcceptableValueList<bool>( [true, false] ) ) );
 
             if(Enabled.Value) {
-                if(!JsonUtils.TryDeserialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Male.json", out LustCageConfig maleConfig )) {
+                if(!JsonUtils.TryDeserialize( Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Male.json", out LustCageConfig maleConfig )) {
                     maleConfig = new LustCageConfig();
-                    _ = JsonUtils.TrySerialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Male.json", maleConfig );
+                    _ = JsonUtils.TrySerialize(Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Male.json", maleConfig );
                 }
                 LustCageMale = maleConfig;
 
-                if(!JsonUtils.TryDeserialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Female.json", out LustCageConfig femaleConfig )) {
+                if(!JsonUtils.TryDeserialize( Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Female.json", out LustCageConfig femaleConfig )) {
                     femaleConfig = new LustCageConfig();
-                    _ = JsonUtils.TrySerialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Female.json", femaleConfig );
+                    _ = JsonUtils.TrySerialize( Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Female.json", femaleConfig );
                 }
                 LustCageFemale = femaleConfig;
 
-                if(!JsonUtils.TryDeserialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Futa.json", out LustCageConfig futaConfig )) {
+                if(!JsonUtils.TryDeserialize( Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Futa.json", out LustCageConfig futaConfig )) {
                     futaConfig = new LustCageConfig();
-                    _ = JsonUtils.TrySerialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Futa.json", futaConfig );
+                    _ = JsonUtils.TrySerialize( Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_LustCage_Futa.json", futaConfig );
                 }
                 LustCageFuta = futaConfig;
             }

@@ -36,21 +36,21 @@ internal class ObeyToEnemyMod {
                 new ConfigDescription( "Activates the modification", new AcceptableValueList<bool>( [true, false] ) ) );
 
             if(Enabled.Value) {
-                if(!JsonUtils.TryDeserialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Male.json", out ObeyToEnemyConfig maleConfig )) {
+                if(!JsonUtils.TryDeserialize(Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Male.json", out ObeyToEnemyConfig maleConfig )) {
                     maleConfig = new ObeyToEnemyConfig();
-                    _ = JsonUtils.TrySerialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Male.json", maleConfig );
+                    _ = JsonUtils.TrySerialize(Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Male.json", maleConfig );
                 }
                 ObeyToEnemyMale = maleConfig;
 
-                if(!JsonUtils.TryDeserialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Female.json", out ObeyToEnemyConfig femaleConfig )) {
+                if(!JsonUtils.TryDeserialize(Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Female.json", out ObeyToEnemyConfig femaleConfig )) {
                     femaleConfig = new ObeyToEnemyConfig();
-                    _ = JsonUtils.TrySerialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Female.json", femaleConfig );
+                    _ = JsonUtils.TrySerialize(Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Female.json", femaleConfig );
                 }
                 ObeyToEnemyFemale = femaleConfig;
 
-                if(!JsonUtils.TryDeserialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Futa.json", out ObeyToEnemyConfig futaConfig )) {
+                if(!JsonUtils.TryDeserialize(Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Futa.json", out ObeyToEnemyConfig futaConfig )) {
                     futaConfig = new ObeyToEnemyConfig();
-                    _ = JsonUtils.TrySerialize( Paths.ConfigPath, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Futa.json", futaConfig );
+                    _ = JsonUtils.TrySerialize(Plugin.PluginConfigs, $"{MyPluginInfo.PLUGIN_GUID}_ObeyToEnemy_Futa.json", futaConfig );
                 }
                 ObeyToEnemyFuta = futaConfig;
             }

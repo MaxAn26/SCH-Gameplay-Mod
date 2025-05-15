@@ -70,10 +70,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Models\" />
-	  <Folder Include="Mods\" />
-	  <Folder Include="Patches\" />
-	  <Folder Include="Components\" />
+	  <Folder Include="Resources\" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
@@ -87,8 +84,7 @@
 
 		<MakeDir Directories="$(SolutionDir)@Release\$(AssemblyName)\$(AssemblyName)" />
 		<Copy SourceFiles="@(CopySource)" DestinationFolder="$(SolutionDir)@Release\$(AssemblyName)\$(AssemblyName)" />
-		<!--<Copy SourceFiles="$(ProjectDir)Enemy Mod_Readme.rtf"
-				DestinationFolder="$(SolutionDir)@Release\$(AssemblyName)" />-->
+		<Copy SourceFiles="$(ProjectDir)Gameplay Mod_Readme.rtf" DestinationFolder="$(SolutionDir)@Release\$(AssemblyName)" />
 		<ZipDirectory SourceDirectory="$(SolutionDir)@Release\$(AssemblyName)" DestinationFile="$(SolutionDir)@Release\$(AssemblyName)-$(AssemblyVersion).zip" Overwrite="true" />
 	</Target>
 </Project>
