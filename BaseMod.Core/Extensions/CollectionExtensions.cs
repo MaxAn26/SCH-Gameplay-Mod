@@ -14,7 +14,7 @@ public static class CollectionExtensions {
         return false;
     }
 
-    public static T RandomItem<T>( this IEnumerable<T> collection ) => RandomUtils.Item( collection );
+    public static T? RandomItem<T>( this IEnumerable<T> collection ) => RandomUtils.Item( collection );
 
     public static void Shuffle<T>( this IList<T> values ) {
         for(int n = values.Count; n > 1;) {

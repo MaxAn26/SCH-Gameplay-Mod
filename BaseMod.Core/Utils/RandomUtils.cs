@@ -9,14 +9,6 @@ public static class RandomUtils {
 
         double dblChance = chance / 100f;
         return Chance( dblChance, successValue, defaultValue );
-        /*if(chance == 0)
-            return defaultValue;
-
-        if(chance == 100)
-            return successValue;
-
-        int rnd = Int32( 0, 100 );
-        return chance >= rnd ? successValue : defaultValue;*/
     }
 
     public static bool Chance( double chance ) => Chance( chance, true, false );
@@ -51,11 +43,11 @@ public static class RandomUtils {
         return DefaultRandom.NextSingle() * (max - min) + min;
     }
 
-    public static T Item<T>( IEnumerable<T> items ) => Item( items.ToList() );
+    public static T? Item<T>( IEnumerable<T> items ) => Item( items.ToList() );
 
-    public static T Item<T>( IList<T> items ) {
+    public static T? Item<T>( IList<T> items ) {
         if(items.Count == 0)
-            throw new ArgumentException( "Collection should contain at least 1 item" );
+            return default;
 
         if(items.Count == 1)
             return items[0];
