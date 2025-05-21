@@ -8,7 +8,7 @@ namespace Solas.GameplayMod.Patches;
 internal class PlayerSexPatch {
     internal static bool Prepare() {
         try {
-            if(!SexDamageMod.IsModActive && !SexInitiatorStateMod.IsModActive)
+            if(!SexDamageMod.IsModActive && !SexInitiatorStateMod.IsModActive && !SexMoveChoiceMod.IsModActive)
                 return false;
 
             return true;
@@ -24,5 +24,12 @@ internal class PlayerSexPatch {
     static void PlayerSexCumFXPostfix() {
         SexDamageMod.PlayerCum();
         SexInitiatorStateMod.Apply();
+    }
+
+    [HarmonyPostfix]
+    [HarmonyWrapSafe]
+    [HarmonyPatch(typeof(PlayerSex), nameof(PlayerSex.Escape))]
+    static void PlayerSexEscapePostfix() {
+        SexMoveChoiceMod.InteractionCounts = 0;
     }
 }

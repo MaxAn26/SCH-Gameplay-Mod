@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using BaseMod.Core.Extensions;
 
@@ -15,6 +11,12 @@ namespace Solas.GameplayMod.Components;
 internal class HealthComponent : MonoBehaviour {
     private PlayerHealthSystem _playerHealth;
     private HealthSystem _enemyHealth;
+    private bool IsPlayer => _playerHealth is not null;
+
+
+    internal float LastCumTime;
+    internal bool IsCharacterSelfCum;
+    internal bool CharacterCum;
 
     #region Il2Cpp .ctor
     static HealthComponent() {
@@ -39,9 +41,39 @@ internal class HealthComponent : MonoBehaviour {
             } else {
                 Destroy(this);
             }
+
+            LastCumTime = Time.time;
         } catch (Exception e) {
             Plugin.Log.Error(e);
             Destroy(this);
+        }
+    }
+
+    public void LateUpdate() {
+        if (CharacterCum) {
+            if (IsPlayer) {
+                if (_playerHealth.CurrentEc < _playerHealth.MaxEc * 0.85 ) {
+                    CharacterCum = false;
+                }
+            } else {
+                if (_enemyHealth.CurrentEc < _enemyHealth.MaxEc * 0.85) {
+                    CharacterCum = false;
+                }
+            }
+        } else {
+            if (IsPlayer) {
+                if (_playerHealth.CurrentEc >= _playerHealth.MaxEc * 0.85) {
+                    CharacterCum = true;
+                    IsCharacterSelfCum = _playerHealth.CurrentEc >= _playerHealth.MaxEc;
+                }
+            } else {
+                if (_enemyHealth.CurrentEc >= _enemyHealth.MaxEc * 0.85) {
+                    CharacterCum = true;
+                    IsCharacterSelfCum = _enemyHealth.CurrentEc >= _enemyHealth.MaxEc;
+                }
+            }
+
+            LastCumTime = Time.time;
         }
     }
 
@@ -85,6 +117,81 @@ internal class HealthComponent : MonoBehaviour {
             return _enemyHealth.MaxEc;
 
         return 0;
+    }
+
+    public void AddHealth(int amount) {
+        if (IsPlayer) {
+            _playerHealth.CurrentHp = Mathf.Clamp(_playerHealth.CurrentHp + amount, 0, _playerHealth.MaxHp);
+            _playerHealth.SendHealthUpdateEvent();
+        } else {
+            _enemyHealth.CurrentHp = Mathf.Clamp(_enemyHealth.CurrentHp + amount, 0, _enemyHealth.MaxHp);
+            _enemyHealth.SendHealthUpdateEvent();
+        }
+    }
+
+    public void SubstractHealth(int amount) {
+        if (IsPlayer) {
+            _playerHealth.CurrentHp = Mathf.Clamp(_playerHealth.CurrentHp - amount, 0, _playerHealth.MaxHp);
+            
+            _playerHealth.SendHealthUpdateEvent();
+        } else {
+            var enemyComponent = gameObject.GetComponentWithCast<EnemyCharacterComponent>();
+            if (enemyComponent is not null && SexSystem.Sexstatus is SEXSTATUS.Fucking && !SexSystem.IsCumming) {
+                if (enemyComponent.EnemyTrait is not null && enemyComponent.EnemyTrait.Invulnerable is Models.CharacterInvulnerable.SexHealth)
+                    amount = 0;
+            }
+
+            int sub = amount * (100 - _enemyHealth.Armor) / 100;
+            _enemyHealth.CurrentHp = Mathf.Clamp(_enemyHealth.CurrentHp - sub, 0, _enemyHealth.MaxHp);
+            
+            if (_enemyHealth.isDead()) {
+                gameObject.SendMessage("Death", SendMessageOptions.DontRequireReceiver);
+            }
+            _enemyHealth.SendHealthUpdateEvent();
+        }
+    }
+
+    public void AddPleasure(int amount) { 
+        if (IsPlayer) {
+            int arousalRoom = _playerHealth.MaxAr - _playerHealth.CurrentAr;
+            int toArousal = Math.Min(amount, arousalRoom);
+            _playerHealth.CurrentAr = Mathf.Clamp(_playerHealth.CurrentAr + toArousal, 0, _playerHealth.MaxAr);
+            int toEcstasy = amount - toArousal;
+            _playerHealth.CurrentEc = Mathf.Clamp(_playerHealth.CurrentEc + toEcstasy, 0, _playerHealth.MaxEc);
+
+            if (_playerHealth.CurrentEc > 0 && _playerHealth.CurrentAr < _playerHealth.MaxAr)
+                _playerHealth.CurrentEc = 0;
+
+            PlayerHealthSystem.onArousalChange?.Invoke(_playerHealth.CurrentAr, _playerHealth.CurrentEc);
+            if (_playerHealth.CurrentEc >= 675 && SexSystem.Sexstatus == SEXSTATUS.Idle) {
+                SexSystem.ShouldMasturbate = true;
+            }
+        } else {
+            var enemyComponent = gameObject.GetComponentWithCast<EnemyCharacterComponent>();
+            if (enemyComponent is not null && SexSystem.Sexstatus is SEXSTATUS.Fucking) {
+                if (enemyComponent.EnemyTrait is not null && enemyComponent.EnemyTrait.Invulnerable is Models.CharacterInvulnerable.Pleasure) {
+                    amount = 0;
+                    if (_enemyHealth.CurrentHp > 10)
+                        SubstractHealth(10);
+                }
+            }
+
+            _enemyHealth.CurrentEc = Mathf.Clamp(_enemyHealth.CurrentEc + amount, 0, _enemyHealth.MaxEc);
+
+            _enemyHealth.SendEcUpdateEvent();
+        }
+    }
+
+    public void ResetPleasure() {
+        if (IsPlayer) {
+            _playerHealth.CurrentEc = 0;
+
+            PlayerHealthSystem.onArousalChange?.Invoke(_playerHealth.CurrentAr, _playerHealth.CurrentEc);
+        } else {
+            _enemyHealth.CurrentEc = Mathf.Clamp(_enemyHealth.MaxEc / 2, 0, _enemyHealth.MaxEc);
+
+            _enemyHealth.SendEcUpdateEvent();
+        }
     }
 
     [HideFromIl2Cpp]

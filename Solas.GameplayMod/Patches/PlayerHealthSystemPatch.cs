@@ -1,8 +1,12 @@
 ﻿using System;
 
+using BaseMod.Core.Extensions;
+
 using HarmonyLib;
 
 using Solas.GameplayMod.Mods;
+
+using UnityEngine.SceneManagement;
 
 namespace Solas.GameplayMod.Patches;
 internal class PlayerHealthSystemPatch {
@@ -42,12 +46,12 @@ internal class PlayerHealthSystemPatch {
     [HarmonyWrapSafe]
     [HarmonyPatch( typeof( PlayerHealthSystem ), nameof( PlayerHealthSystem.UpdateArousal ) )]
     static bool PlayerHealthSystemUpdateArousalPrefix( bool __runOriginal, ref int __0, ref int __1 ) {
-        if(SexDamageMod.IsSexDamage) {
-            SexMoveChoiceMod.CheckPlayerArousal(ref __1 );
-            SexDamageMod.PlayerDamage(ref __0, ref __1);
+        if (SceneManager.GetActiveScene().buildIndex > 4 && SexSystem.Sexstatus is SEXSTATUS.Fucking && !SexSystem.IsCumming && SexDamageMod.IsModActive) {
+            Plugin.Log.Info($"UpdateArousal: {__0}/{__1}");
+            return false;
         }
 
-        if(!__runOriginal)
+        if (!__runOriginal)
             return false;
 
         return true;

@@ -53,12 +53,15 @@ internal class FuckMeMod {
 
     private static IEnumerator FuckMeEnumerator() {
         do {
-            if (SexSystem is null || PlayerRigitbody is null || SexSystem.GameOver || SceneManager.GetActiveScene().buildIndex < 4)                 yield break;
+            if (SexSystem is null || PlayerRigitbody is null || SexSystem.GameOver || SceneManager.GetActiveScene().buildIndex < 4)                 
+                yield break;
 
-            if (SexSystem.Sexstatus is SEXSTATUS.Fucking)                 NotAvailable = true;
-else if (SexSystem.Sexstatus is SEXSTATUS.Idle && SexSystem.playerHealthSystem.CurrentAr == SexSystem.playerHealthSystem.MaxAr) {
-                if(!NotAvailable)                     NotAvailable = false;
-else {
+            if (SexSystem.Sexstatus is SEXSTATUS.Fucking)                 
+                NotAvailable = true;
+            else if (SexSystem.Sexstatus is SEXSTATUS.Idle && SexSystem.playerHealthSystem.CurrentAr == SexSystem.playerHealthSystem.MaxAr) {
+                if(!NotAvailable)                    
+                    NotAvailable = false;
+                else {
                     int chance = 5;
                     chance += SexSystem.playerHealthSystem.CurrentEc / 10;
                     if (chance > 40)
@@ -70,7 +73,7 @@ else {
                         PlayerRigitbody.velocity = Vector3.zero;
                         PlayerRigitbody.angularVelocity = Vector3.zero;
                         SexSystem.Taunt();
-                        yield return new WaitForSeconds(6f);
+                        yield return new WaitForSeconds(5f);
                         SexSystem.CanMove = true;
                     }
                 }

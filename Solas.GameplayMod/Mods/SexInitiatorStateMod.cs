@@ -44,7 +44,7 @@ internal class SexInitiatorStateMod {
                 return;
 
             IsAttacker = false;
-            if(Character.adultSettingsDATA.CounterVictim) //SexSystem.IsThreesome || 
+            if(SexSystem.IsThreesome || Character.adultSettingsDATA.CounterVictim)
                 return;
 
             if(Character.statusDATA.IsBoundHeavyRestraint > 0)
@@ -68,10 +68,10 @@ internal class SexInitiatorStateMod {
     internal static void SetInitiator( SexSystem sexSystem ) {
         SexSystem ??= sexSystem;
 
-        /*if(SexSystem.IsThreesome) {
+        if(SexSystem.IsThreesome) {
             SexSystem.PlayerAttacker = false;
             return;
-        }*/
+        }
 
         if(IsAttacker is not null)
             SexSystem.PlayerAttacker = IsAttacker.Value;

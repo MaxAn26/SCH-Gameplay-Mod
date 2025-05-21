@@ -29,13 +29,13 @@ internal class SexMoveChoiceMod {
     internal static bool IsModActive => Enabled.Value;
     internal static List<SexMoveExtended> SexMoves { get; set; } = [];
     internal static List<EnemySexTypesModel> EnemySexTypes { get; set; } = [];
+    internal static int InteractionCounts { get; set; } = 0;
     #endregion
 
     #region Storage
     internal static CharacterData Character => CharacterData.Instance;
     internal static SexSystem SexSystem;
     internal static SexMoveExtended LastSexMove;
-    internal static int LastPlayerExctasy;
     #endregion
 
     internal static void Load(ConfigFile config) {
@@ -123,6 +123,8 @@ internal class SexMoveChoiceMod {
                 return;
 
             var move = GetSexMove();
+            InteractionCounts++;
+
             if (move is null) {
                 Plugin.Log.Info("SexMove is NULL");
                 return;
@@ -138,7 +140,7 @@ internal class SexMoveChoiceMod {
         }
     }
 
-    internal static void CheckPlayerArousal(ref int newEcstasy) {
+    internal static void CheckPlayerArousal(ref int ecstasy) {
         try {
             if (!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
                 return;
@@ -157,25 +159,32 @@ internal class SexMoveChoiceMod {
             }
 
             CharacterCumCondition cumCondition = SexSystem.PlayerAttacker ? LastSexMove.CasterCum : LastSexMove.TargetCum;
-            int ecstasy = newEcstasy - LastPlayerExctasy;
 
             if (!cumCondition.HasFlag(CharacterCumCondition.Always)) {
                 if (cumCondition.HasFlag(CharacterCumCondition.SexToy)) {
                     if (Character.statusDATA.IsBoundVibrator == 0 && Character.statusDATA.IsBoundPlug == 0 && Character.statusDATA.IsBoundNippleClamps == 0)
-                        ecstasy = 1;
+                        ecstasy = 0;
                 } else {
                     switch (SexSystem.Stage) {
-                        case 1 or 2:
-                            if (!cumCondition.HasFlag(CharacterCumCondition.Dominated))
-                                ecstasy = 1;
+                        case 1:
+                            if (!cumCondition.HasFlag(CharacterCumCondition.Dominated) && !cumCondition.HasFlag(CharacterCumCondition.FullDominated))
+                                ecstasy = RandomUtils.Chance(30, 1, 0);
+                            break;
+                        case 2:
+                            if (!cumCondition.HasFlag(CharacterCumCondition.Dominated) && !cumCondition.HasFlag(CharacterCumCondition.PreDominated))
+                                ecstasy = RandomUtils.Chance(30, 1, 0);
                             break;
                         case 3:
                             if (!cumCondition.HasFlag(CharacterCumCondition.Idle))
-                                ecstasy = 1;
+                                ecstasy = RandomUtils.Chance(30, 1, 0);
                             break;
-                        case 4 or 5:
-                            if (!cumCondition.HasFlag(CharacterCumCondition.Dominating))
-                                ecstasy = 1;
+                        case 4:
+                            if (!cumCondition.HasFlag(CharacterCumCondition.Dominating) && !cumCondition.HasFlag(CharacterCumCondition.PreDominating))
+                                ecstasy = RandomUtils.Chance(30, 1, 0);
+                            break;
+                        case 5:
+                            if (!cumCondition.HasFlag(CharacterCumCondition.Dominating) && !cumCondition.HasFlag(CharacterCumCondition.FullDominating))
+                                ecstasy = RandomUtils.Chance(30, 1, 0);
                             break;
                         default:
                             break;
@@ -183,14 +192,12 @@ internal class SexMoveChoiceMod {
                 }
             }
 
-            LastPlayerExctasy += ecstasy;
-            newEcstasy = LastPlayerExctasy;
         } catch (Exception ex) {
             Plugin.Log.Error(ex.Message);
         }
     }
 
-    internal static void CheckEnemyArousal(HealthSystem healthSystem, ref int damage) {
+    internal static void CheckEnemyArousal(ref int damage) {
         try {
             if (!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
                 return;
@@ -204,33 +211,29 @@ internal class SexMoveChoiceMod {
             if (LastSexMove is null)
                 return;
 
-            if (healthSystem.CurrentEc < healthSystem.MaxEc / 2) {
-                return;
-            }
-
             CharacterCumCondition cumCondition = !SexSystem.PlayerAttacker ? LastSexMove.CasterCum : LastSexMove.TargetCum;
 
             if (!cumCondition.HasFlag(CharacterCumCondition.Always)) {
                 switch (SexSystem.Stage) {
                     case 1:
                         if (!cumCondition.HasFlag(CharacterCumCondition.Dominated) && !cumCondition.HasFlag(CharacterCumCondition.FullDominated))
-                            damage = 1;
+                            damage = RandomUtils.Chance(30, 1, 0);
                         break;
                     case 2:
                         if (!cumCondition.HasFlag(CharacterCumCondition.Dominated) && !cumCondition.HasFlag(CharacterCumCondition.PreDominated))
-                            damage = 1;
+                            damage = RandomUtils.Chance(30, 1, 0);
                         break;
                     case 3:
                         if (!cumCondition.HasFlag(CharacterCumCondition.Idle))
-                            damage = 1;
+                            damage = RandomUtils.Chance(30, 1, 0);
                         break;
                     case 4 :
                         if (!cumCondition.HasFlag(CharacterCumCondition.Dominating) && !cumCondition.HasFlag(CharacterCumCondition.PreDominating))
-                            damage = 1;
+                            damage = RandomUtils.Chance(30, 1, 0);
                         break;
                     case 5:
                         if (!cumCondition.HasFlag(CharacterCumCondition.Dominating) && !cumCondition.HasFlag(CharacterCumCondition.FullDominating))
-                            damage = 1;
+                            damage = RandomUtils.Chance(30, 1, 0);
                         break;
                     default:
                         break;
@@ -241,32 +244,47 @@ internal class SexMoveChoiceMod {
         }
     }
 
+    internal static EnemySexTypesModel GetEnemySexTypes(int enemyTypeId) {
+        try {
+            return EnemySexTypes.Where(t => t.EnemyType == enemyTypeId).RandomItem();
+        } catch (Exception ex) {
+            Plugin.Log.Error(ex);
+            return null;
+        }
+    }
+
     private static SexMoveExtended GetSexMove() {
+        EnemyCharacterComponent enemyCharacter = SexSystem.Enemy.GetComponentWithCast<EnemyCharacterComponent>();
         CharacterGender caster = SexSystem.CasterMale ? CharacterGender.Male : CharacterGender.Female;
         CharacterGender target = SexSystem.TargetMale ? CharacterGender.Male : CharacterGender.Female;
-        bool isCollared = !SexSystem.PlayerAttacker && Character.statusDATA.IsBoundCollar > 0;
-        EnemySexTypesModel enemySexTypes = SexSystem.Enemy.TryGetComponentWithCast(out EnemyAI enemyAI) ? EnemySexTypes.FirstOrDefault( t => t.EnemyType == enemyAI.typeOfEnemy) : null;
+        bool isCollared = !SexSystem.PlayerAttacker && (Character.statusDATA.IsBoundCollar > 0 || Character.statusDATA.TrainedLevel >= 1);
+        EnemySexTypesModel enemySexTypes = SexSystem.Enemy.GetComponentWithCast<EnemyCharacterComponent>()?.EnemySexTypes;
         SexPositionType positionType = GetSexPositionType();
         List<SexMoveExtended> sexMoves = [];
         foreach (var sexMove in SexMoves) {
             if (sexMove.IsDisabled)
                 continue;
 
-            switch (positionType) {
-                case SexPositionType.Foreplay:
-                    if (sexMove.Type is >= 5)
-                        continue;
-                    break;
-                case SexPositionType.Other:
-                    if (sexMove.Type != 5)
-                        continue;
-                    break;
-                case SexPositionType.Sex:
-                    if (sexMove.Type is < 6)
-                        continue;
-                    break;
-                default:
-                    break;
+            // Enemy trait sex type should be used always if they setted
+            if (enemyCharacter is not null && enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.SexTypes.Any() && !enemyCharacter.EnemyTrait.SexTypes.Contains(sexMove.Type)) { 
+                continue; 
+            } else {
+                switch (positionType) {
+                    case SexPositionType.Foreplay:
+                        if (sexMove.Type is >= 5)
+                            continue;
+                        break;
+                    case SexPositionType.Other:
+                        if (sexMove.Type != 5)
+                            continue;
+                        break;
+                    case SexPositionType.Sex:
+                        if (sexMove.Type is < 6)
+                            continue;
+                        break;
+                    default:
+                        break;
+                }
             }
 
             if (sexMove.IsCommand && !isCollared)
@@ -318,18 +336,17 @@ internal class SexMoveChoiceMod {
 
     private static SexPositionType GetSexPositionType() {
         if (UsePoseSelectionSystem.Value) {
-            if (RandomUtils.Float(0f, 1f) < 0.15f)
+            float sexChance = 1f - Mathf.Exp(-InteractionCounts / 2f); // /2 управляет “скоростью” роста
+            float foreplayChance = 1f - sexChance;
+
+            float rnd = RandomUtils.Float(0f, 1f);
+
+            if (rnd < foreplayChance * 0.8f)
+                return SexPositionType.Foreplay;
+            else if (rnd < foreplayChance)
                 return SexPositionType.Other;
 
-            HealthComponent healthComponent = SexSystem.Target.TryGetComponentWithCast(out HealthComponent result) ? result : null;
-            float rand = RandomUtils.Float(0f, 1f);
-            float arousalRate = (float)healthComponent.GetArousal() / healthComponent.GetMaxArousal();
-            float sexChance = Mathf.Clamp(arousalRate - 0.3f, 0f, 1f);
-
-            if (rand <= sexChance)
-                return SexPositionType.Sex;
-            else
-                return SexPositionType.Foreplay;
+            return SexPositionType.Sex;
         }
 
         return SexPositionType.All;
@@ -1653,7 +1670,7 @@ internal class SexMoveChoiceMod {
                 Name = "Wrestlers breastsmother",
                 Description = "Attempt to erotically smother your partner with your boobs",
                 CasterCum = CharacterCumCondition.Always,
-                CasterGender = CharacterGender.Any,
+                CasterGender = CharacterGender.Female,
                 CasterRole = CharacterRole.Any,
                 TargetCum = CharacterCumCondition.SexToy,
                 TargetGender = CharacterGender.Any,

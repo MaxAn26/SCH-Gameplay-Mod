@@ -9,9 +9,6 @@ namespace Solas.GameplayMod.Patches;
 internal class EnemyAIPatch {
     internal static bool Prepare() {
         try {
-            if(!EnemyHPResetMod.IsModActive && !ObeyToEnemyMod.IsModActive && !SexDamageMod.IsModActive && !SexInitiatorStateMod.IsModActive)
-                return false;
-
             return true;
         } catch(Exception) {
             Plugin.Log.LogWarning( $"{nameof( EnemyAIPatch )} not applied due exeption" );

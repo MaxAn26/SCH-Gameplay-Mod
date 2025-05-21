@@ -5,6 +5,7 @@ using BaseMod.Core.Extensions;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 
+using Solas.GameplayMod.Models;
 using Solas.GameplayMod.Mods;
 
 using UnityEngine;
@@ -14,6 +15,8 @@ internal class EnemyCharacterComponent : MonoBehaviour {
     internal MaterialPropertyBlock MaterialPropertyBlock = new();
     internal SexSystem SexSystem;
     internal EnemyAI EnemyAI;
+    internal EnemyTraitModel EnemyTrait;
+    internal EnemySexTypesModel EnemySexTypes;
 
     internal bool? IsActive;
     internal int LastEcstasy = -1;
@@ -43,8 +46,21 @@ internal class EnemyCharacterComponent : MonoBehaviour {
 
             if (RandomEnemyRoleMod.IsModActive) {
                 IsActive = RandomEnemyRoleMod.GetRandomRole(enemyAI.EnSex.EnemyMale);
-                if (IsActive is not null) {
+            }
 
+            if (EnemyTraitsMod.IsModActive) {
+                var trait = EnemyTraitsMod.GetEnemyTrait(EnemyAI.typeOfEnemy);
+                if (trait is not null) {
+                    EnemyTraitsMod.ApplyTrait(enemyAI, trait);
+                    EnemyTrait = trait;
+                    Plugin.Log.Info($"Enemy '{EnemyAI.enemyName}' get {trait.Name} ({trait.TraitType}) trait");
+                }
+            }
+
+            if (SexMoveChoiceMod.IsModActive && SexMoveChoiceMod.UseEnemyTypes.Value) {
+                var sexTypes = SexMoveChoiceMod.GetEnemySexTypes(EnemyAI.typeOfEnemy);
+                if (sexTypes is not null) {
+                    EnemySexTypes = sexTypes;
                 }
             }
         } catch (Exception e) {

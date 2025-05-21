@@ -20,11 +20,31 @@ internal class SexSystemPatch {
         }
     }
 
+    [HarmonyPrefix]
+    [HarmonyWrapSafe]
+    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundPlayer))]
+    static bool SexSystemBoundPlayerPrefix(SexSystem __instance, bool __runOriginal) {
+        if (OrgasmControlMod.ApplyPunishmentOrgasm(__instance))
+            return false;
+
+        if (!__runOriginal)
+            return false;
+
+        return true;
+    }
+
     [HarmonyPostfix]
     [HarmonyWrapSafe]
     [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundPlayerTrap))]
     static void SexSystemBoundPlayerTrapPostfix(SexSystem __instance) {
         ExtraBondageTrapMod.Apply(__instance);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyWrapSafe]
+    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BreakRestraint))]
+    static void SexSystemBreakRestraintPostfix(SexSystem __instance) {
+        OrgasmControlMod.BreakPunishmentOrgasm(__instance);
     }
 
     [HarmonyPrefix]
@@ -76,6 +96,7 @@ internal class SexSystemPatch {
     [HarmonyWrapSafe]
     [HarmonyPatch( typeof( SexSystem ), nameof( SexSystem.SetSexAnimation ) )]
     static void SexSystemSetSexAnimationPostfix( SexSystem __instance ) {
+        OrgasmControlMod.ApplySexControl(__instance);
         RandomReverseMod.Apply( __instance );
     }
 
@@ -95,6 +116,7 @@ internal class SexSystemPatch {
     [HarmonyWrapSafe]
     [HarmonyPatch( typeof( SexSystem ), nameof( SexSystem.SetThreesomeAnimation ) )]
     static void SexSystemSetThreesomeAnimationPostfix( SexSystem __instance ) {
+        OrgasmControlMod.ApplySexControl(__instance );
         RandomReverseMod.Apply( __instance );
     }
 
@@ -110,11 +132,19 @@ internal class SexSystemPatch {
         return true;
     }
 
+    [HarmonyPostfix]
+    [HarmonyWrapSafe]
+    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.SetHeavyBondageAnimation))]
+    static void SexSystemSetHeavyBondageAnimationPostfix(SexSystem __instance) {
+        OrgasmControlMod.ApplySexControl(__instance);
+    }
+
     [HarmonyPrefix]
     [HarmonyWrapSafe]
     [HarmonyPatch( typeof( SexSystem ), nameof( SexSystem.Setup ) )]
     static bool SexSystemSetupPrefix( SexSystem __instance, bool __runOriginal ) {
         SexInitiatorStateMod.SetInitiator( __instance );
+        OrgasmControlMod.ResetSelfControl();
 
         if(!__runOriginal)
             return false;
@@ -139,6 +169,8 @@ internal class SexSystemPatch {
     static bool SexSystemSexDamagePrefix( SexSystem __instance, bool __runOriginal ) {
         SexDamageMod.IsSexDamage = true;
         SexDamageMod.SexDamageSavePlayerEc = __instance.playerHealthSystem.CurrentEc;
+        if (SexDamageMod.ApplySexDamage())
+            return false;
 
         if(!__runOriginal)
             return false;
