@@ -1,7 +1,5 @@
 ﻿using System;
 
-using BaseMod.Core.Extensions;
-
 using HarmonyLib;
 
 using Solas.GameplayMod.Mods;
@@ -25,7 +23,7 @@ internal class HealthSystemPatch {
     [HarmonyPrefix]
     [HarmonyWrapSafe]
     [HarmonyPatch( typeof( HealthSystem ), nameof( HealthSystem.IncreaseEc ) )]
-    static bool HealthSystemIncreaseEcPrefix( HealthSystem __instance, bool __runOriginal, ref int __0 ) {
+    static bool HealthSystemIncreaseEcPrefix( bool __runOriginal ) {
         if(SceneManager.GetActiveScene().buildIndex > 4 && SexSystem.Sexstatus is SEXSTATUS.Fucking && SexDamageMod.IsModActive){
             return false;
         }
@@ -39,7 +37,7 @@ internal class HealthSystemPatch {
     [HarmonyPrefix]
     [HarmonyWrapSafe]
     [HarmonyPatch( typeof( HealthSystem ), nameof( HealthSystem.SubstractHealth ) )]
-    static bool HealthSystemSubstractHealthPrefix( HealthSystem __instance, bool __runOriginal, ref int __0 ) {
+    static bool HealthSystemSubstractHealthPrefix( bool __runOriginal ) {
         if (SceneManager.GetActiveScene().buildIndex > 4 && SexSystem.Sexstatus is SEXSTATUS.Fucking && SexDamageMod.IsModActive) {
             return false;
         }
@@ -47,6 +45,6 @@ internal class HealthSystemPatch {
         if (!__runOriginal)
             return false;
 
-        return __0 != 0;
+        return true;
     }
 }

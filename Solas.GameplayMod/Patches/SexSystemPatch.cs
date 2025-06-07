@@ -10,7 +10,7 @@ namespace Solas.GameplayMod.Patches;
 internal class SexSystemPatch {
     internal static bool Prepare() {
         try {
-            if(!FuckMeMod.IsModActive && !ExtraBondageTrapMod.IsModActive && !EnemyHPResetMod.IsModActive && !LustCageMod.IsModActive && !ObeyToEnemyMod.IsModActive && !SexDamageMod.IsModActive && !RandomEnemyRoleMod.IsModActive && !SexMoveChoiceMod.IsModActive && !SexInitiatorStateMod.IsModActive && !RandomReverseMod.IsModActive)
+            if(!FuckMeMod.IsModActive && !EnemySexExtendMod.IsModActive && !ExtraBondageTrapMod.IsModActive && !EnemyHPResetMod.IsModActive && !LustCageMod.IsModActive && !ObeyToEnemyMod.IsModActive && !SexDamageMod.IsModActive && !RandomEnemyRoleMod.IsModActive && !SexMoveChoiceMod.IsModActive && !SexInitiatorStateMod.IsModActive && !RandomReverseMod.IsModActive)
                 return false;
 
             return true;
@@ -96,6 +96,7 @@ internal class SexSystemPatch {
     [HarmonyWrapSafe]
     [HarmonyPatch( typeof( SexSystem ), nameof( SexSystem.SetSexAnimation ) )]
     static void SexSystemSetSexAnimationPostfix( SexSystem __instance ) {
+        EnemySexExtendMod.ReduceEnemyPower(__instance);
         OrgasmControlMod.ApplySexControl(__instance);
         RandomReverseMod.Apply( __instance );
     }
@@ -145,6 +146,7 @@ internal class SexSystemPatch {
     static bool SexSystemSetupPrefix( SexSystem __instance, bool __runOriginal ) {
         SexInitiatorStateMod.SetInitiator( __instance );
         OrgasmControlMod.ResetSelfControl();
+        EnemySexExtendMod.UpdateThreesome(__instance);
 
         if(!__runOriginal)
             return false;

@@ -254,6 +254,14 @@ internal class SexDamageMod {
 
                 SexMoveChoiceMod.CheckEnemyArousal(ref damage);
                 damage = OrgasmControlMod.ArousalFatigueCheck(SexSystem.Enemy, damage);
+                if (!SexSystem.IsThreesome && SexSystem.Enemy.TryGetComponentWithCast(out EnemyCharacterComponent enemyCharacter)) {
+                    if (EnemySexExtendMod.IsFetishTriggered(SexSystem, enemyCharacter.EnemyFetish)) {
+                        damage += 1;
+                    }
+
+                    if (EnemySexExtendMod.IsWeaknessesTriggered(SexSystem, enemyCharacter.AsCasterWeaknesses, enemyCharacter.AsTargetWeaknesses))
+                        damage += 1;
+                }
 
                 Plugin.Log.Info($"Enemy sex damage: {damage}");
                 SexSystem.Enemy.GetComponentWithCast<HealthComponent>()?.AddPleasure(damage);

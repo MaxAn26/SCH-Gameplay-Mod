@@ -14,13 +14,13 @@ public static class RandomUtils {
     public static bool Chance( double chance ) => Chance( chance, true, false );
 
     public static T Chance<T>( double chance, T successValue, T defaultValue ) {
-        if(chance < 0 || chance > 100)
-            throw new ArgumentOutOfRangeException( nameof( chance ), $"Value '{nameof( chance )}' should be in range [0-100]" );
+        if(chance < 0f || chance > 1f)
+            throw new ArgumentOutOfRangeException( nameof( chance ), $"Value '{nameof( chance )}' should be in range [0.0-1.0]" );
 
-        if(chance == 0)
+        if(chance == 0f)
             return defaultValue;
 
-        if(chance == 1)
+        if(chance == 1f)
             return successValue;
 
         double rnd = DefaultRandom.NextDouble();
@@ -53,5 +53,16 @@ public static class RandomUtils {
             return items[0];
 
         return items[DefaultRandom.Next( items.Count )];
+    }
+
+    public static T? Flag<T>(T flags) 
+        where T : Enum {
+        List<T> list = new();
+        foreach (T value in Enum.GetValues(typeof(T))) {
+            if (flags.HasFlag(value))
+                list.Add(value);
+        }
+
+        return Item(list);
     }
 }

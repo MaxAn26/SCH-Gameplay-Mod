@@ -1,6 +1,7 @@
 ﻿using System;
 
 using BaseMod.Core.Extensions;
+using BaseMod.Core.Utils;
 
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
@@ -16,7 +17,12 @@ internal class EnemyCharacterComponent : MonoBehaviour {
     internal SexSystem SexSystem;
     internal EnemyAI EnemyAI;
     internal EnemyTraitModel EnemyTrait;
-    internal EnemySexTypesModel EnemySexTypes;
+    internal EnemySexModel EnemySexTypes;
+
+    internal Fetish EnemyFetish = Fetish.NoFetish;
+    internal Weaknesses AsCasterWeaknesses = Weaknesses.NoWeaknesses;
+    internal Weaknesses AsTargetWeaknesses = Weaknesses.NoWeaknesses;
+    internal int CorruptionChance;
 
     internal bool? IsActive;
     internal int LastEcstasy = -1;
@@ -57,10 +63,14 @@ internal class EnemyCharacterComponent : MonoBehaviour {
                 }
             }
 
-            if (SexMoveChoiceMod.IsModActive && SexMoveChoiceMod.UseEnemyTypes.Value) {
-                var sexTypes = SexMoveChoiceMod.GetEnemySexTypes(EnemyAI.typeOfEnemy);
+            if (EnemySexExtendMod.IsModActive) {
+                var sexTypes = EnemySexExtendMod.GetEnemySexTypes(EnemyAI.typeOfEnemy);
                 if (sexTypes is not null) {
                     EnemySexTypes = sexTypes;
+                    EnemyFetish = RandomUtils.Flag(EnemySexTypes.AllowedFetishes);
+                    AsCasterWeaknesses = RandomUtils.Flag(EnemySexTypes.CasterWeaknesses);
+                    AsTargetWeaknesses = RandomUtils.Flag(EnemySexTypes.TargetWeaknesses);
+                    CorruptionChance = EnemySexExtendMod.CalculateCorruption(EnemySexTypes.CorruptionChance, EnemyFetish);
                 }
             }
         } catch (Exception e) {

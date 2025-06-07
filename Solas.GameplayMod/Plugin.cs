@@ -18,6 +18,7 @@ namespace Solas.GameplayMod;
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class Plugin : BasePlugin {
     internal static new ManualLogSource Log;
+    internal static string PluginAssets;
     internal static string PluginConfigs;
     internal static string PluginResources;
     internal static Harmony Harmony = new(MyPluginInfo.PLUGIN_GUID);
@@ -26,17 +27,21 @@ public class Plugin : BasePlugin {
         // Plugin startup logic
         Log = base.Log;
         string baseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        PluginAssets = Path.Combine(baseDirectory, "Assets");
         PluginConfigs = Path.Combine(baseDirectory, "Configs");
         PluginResources = Path.Combine(baseDirectory, "Resources");
 
         CapturedSlaveMod.Load(Config);
         CriticalHitMod.Load(Config);
         EnemyHPResetMod.Load(Config);
+        EnemySexExtendMod.Load(Config);
+        EnemyTraitsMod.Load(Config);
         ExtraBondageTrapMod.Load(Config);
         FuckMeMod.Load(Config);
         GlossEffectMod.Load(Config);
         LustCageMod.Load(Config);
         ObeyToEnemyMod.Load(Config);
+        OrgasmControlMod.Load(Config);
         RandomEnemyRoleMod.Load(Config);
         RandomFutaMod.Load(Config);
         RandomReverseMod.Load(Config);
@@ -62,6 +67,7 @@ public class Plugin : BasePlugin {
         Log.Info($"Scene loaded: Name: {scene.name}, BuildIndex: {scene.buildIndex}");
         if (scene.buildIndex >= 4) {
             SexMoveChoiceMod.Prepare();
+            EnemyTraitsMod.Reset();
         }
     }
 }

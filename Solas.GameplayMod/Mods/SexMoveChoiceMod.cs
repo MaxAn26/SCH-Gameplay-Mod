@@ -20,7 +20,6 @@ internal class SexMoveChoiceMod {
     #region Configuration
     internal static ConfigEntry<bool> Enabled;
     internal static ConfigEntry<bool> ArousalExtention;
-    internal static ConfigEntry<bool> UseEnemyTypes;
     internal static ConfigEntry<bool> UsePlayerPreferredPositions;
     internal static ConfigEntry<bool> UsePoseSelectionSystem;
     #endregion
@@ -28,7 +27,6 @@ internal class SexMoveChoiceMod {
     #region States
     internal static bool IsModActive => Enabled.Value;
     internal static List<SexMoveExtended> SexMoves { get; set; } = [];
-    internal static List<EnemySexTypesModel> EnemySexTypes { get; set; } = [];
     internal static int InteractionCounts { get; set; } = 0;
     #endregion
 
@@ -44,20 +42,11 @@ internal class SexMoveChoiceMod {
                 new ConfigDescription("Activates the modification", new AcceptableValueList<bool>([true, false])));
             ArousalExtention = config.Bind(nameof(SexMoveChoiceMod), nameof(ArousalExtention), true,
                 new ConfigDescription("Gain arousal according with animation", new AcceptableValueList<bool>([true, false])));
-            UseEnemyTypes = config.Bind(nameof(SexMoveChoiceMod), nameof(UseEnemyTypes), false,
-                new ConfigDescription("Use sex positions specified to enemy type", new AcceptableValueList<bool>([true, false])));
             UsePlayerPreferredPositions = config.Bind(nameof(SexMoveChoiceMod), nameof(UsePlayerPreferredPositions), false,
                 new ConfigDescription("ONLY use preferred positions for player", new AcceptableValueList<bool>([true, false])));
             UsePoseSelectionSystem = config.Bind(nameof(SexMoveChoiceMod), nameof(UsePoseSelectionSystem), true,
                 new ConfigDescription("Use position selection system. Than lower target aroused then higher chance to start a foreplay", new AcceptableValueList<bool>([true, false])));
 
-            if (UseEnemyTypes.Value) {
-                if (!JsonUtils.TryDeserialize(Plugin.PluginResources, "EnemySexTypes.json", out List<EnemySexTypesModel> enemySexType)) {
-                    enemySexType = GetEnemySexTypes();
-                    JsonUtils.TrySerialize(Plugin.PluginResources, "EnemySexTypes.json", enemySexType);
-                }
-                EnemySexTypes = enemySexType;
-            }
         } catch (Exception ex) {
             Plugin.Log.Error(ex.Message);
         }
@@ -131,10 +120,11 @@ internal class SexMoveChoiceMod {
             }
 
             Plugin.Log.Info($"Set SexMove: ID: {move.ID}({move.Type}) Name: '{move.Name}'");
-            if (SexSystem.IsThreesome)
+            if (SexSystem.IsThreesome) {
                 SexSystem.SexType = move.Type;
-            else
+            } else{
                 SexSystem.SexID = move.ID;
+            }
         } catch (Exception ex) {
             Plugin.Log.Error(ex);
         }
@@ -244,21 +234,29 @@ internal class SexMoveChoiceMod {
         }
     }
 
-    internal static EnemySexTypesModel GetEnemySexTypes(int enemyTypeId) {
+    internal static bool IsCharacterCorrupted() {
         try {
-            return EnemySexTypes.Where(t => t.EnemyType == enemyTypeId).RandomItem();
+            if (!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
+                return false;
+
+            if (!SexSystem.PlayerAttacker) {
+                return RandomUtils.Chance(((Character.statusDATA.TrainedLevel * 0.4f) + (Character.statusDATA.CorruptionLevel * 0.6f)) / 10f);
+            } else {
+                int chance = SexSystem.Enemy.GetComponentWithCast<EnemyCharacterComponent>()?.CorruptionChance ?? 0;
+                return RandomUtils.Chance(chance);
+            }
         } catch (Exception ex) {
             Plugin.Log.Error(ex);
-            return null;
+            return false;
         }
     }
 
     private static SexMoveExtended GetSexMove() {
         EnemyCharacterComponent enemyCharacter = SexSystem.Enemy.GetComponentWithCast<EnemyCharacterComponent>();
+        EnemySexModel enemySexTypes = enemyCharacter?.EnemySexTypes;
         CharacterGender caster = SexSystem.CasterMale ? CharacterGender.Male : CharacterGender.Female;
         CharacterGender target = SexSystem.TargetMale ? CharacterGender.Male : CharacterGender.Female;
-        bool isCollared = !SexSystem.PlayerAttacker && (Character.statusDATA.IsBoundCollar > 0 || Character.statusDATA.TrainedLevel >= 1);
-        EnemySexTypesModel enemySexTypes = SexSystem.Enemy.GetComponentWithCast<EnemyCharacterComponent>()?.EnemySexTypes;
+        bool isCollared = IsCharacterCorrupted();
         SexPositionType positionType = GetSexPositionType();
         List<SexMoveExtended> sexMoves = [];
         foreach (var sexMove in SexMoves) {
@@ -294,7 +292,7 @@ internal class SexMoveChoiceMod {
                 if (UsePlayerPreferredPositions.Value && !Character.statusDATA.PreferredSex.Contains(sexMove.ID))
                     continue;
             } else {
-                if (UseEnemyTypes.Value && enemySexTypes is not null) {
+                if (enemySexTypes is not null) {
                     if (!enemySexTypes.UseTag && !enemySexTypes.CheckSexMove(sexMove.ID))
                         continue;
                     else if (enemySexTypes.UseTag && !enemySexTypes.CheckSexTag(sexMove))
@@ -4517,49 +4515,6 @@ internal class SexMoveChoiceMod {
         ];
 
         return sexMoves;
-    }
-
-    private static List<EnemySexTypesModel> GetEnemySexTypes() {
-        List<EnemySexTypesModel> enemySexTypes = [
-            new() {
-                Name = "Master",
-                EnemyType = 0,
-                UseTag = true,
-                SexTags = SexTag.Dominant | SexTag.Smothering
-            },
-            new() {
-                Name = "Fighter",
-                EnemyType = 1,
-                UseTag = true,
-                SexTags = SexTag.Wrestling | SexTag.Dominant
-            },
-            new() {
-                Name = "Ninja",
-                EnemyType = 2,
-                UseTag = true,
-                SexTags = SexTag.Wrestling | SexTag.Smothering
-            },
-            new() {
-                Name = "Police",
-                EnemyType = 3,
-                UseTag = true,
-                SexTags = SexTag.Dominant | SexTag.Smothering
-            },
-            new() {
-                Name = "Servant",
-                EnemyType = 4,
-                UseTag = true,
-                SexTags = SexTag.Service | SexTag.Sensual
-            },
-            new() {
-                Name = "Succubus",
-                EnemyType = 7,
-                UseTag = true,
-                SexTags = SexTag.Sensual | SexTag.Service | SexTag.Smothering
-            },
-        ];
-
-        return enemySexTypes;
     }
 }
 

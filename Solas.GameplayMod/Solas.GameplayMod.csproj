@@ -67,19 +67,31 @@
 	  <Reference Include="UnityEngine.PhysicsModule">
 	    <HintPath>..\Libs\UnityEngine.PhysicsModule.dll</HintPath>
 	  </Reference>
+	  <Reference Include="UnityEngine.UI">
+	    <HintPath>..\Libs\UnityEngine.UI.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec WorkingDirectory="$(SolutionDir)" Command="mkdir &quot;@Mods/$(TargetName)&quot;&#xD;&#xA;&#xD;&#xA;xcopy &quot;$(TargetDir)*.dll&quot; &quot;@Mods/$(TargetName)&quot; /Y&#xD;&#xA;&#xD;&#xA;if %25errorlevel%25 leq 4 exit 0 else exit %25errorlevel%25" />
+		<ItemGroup>
+			<CopySource Include="$(PublishDir)*.dll" />
+			<PreConfiguredFiles Include="$(ProjectDir)PreConfiguredFiles\**\*.*" />
+		</ItemGroup>
+
+		<MakeDir Directories="$(SolutionDir)@Mods\$(AssemblyName)" />
+		<Copy SourceFiles="@(CopySource)" DestinationFolder="$(SolutionDir)@Mods\$(AssemblyName)" />
+		<Copy SourceFiles="@(PreConfiguredFiles)" DestinationFolder="$(SolutionDir)@Mods\$(AssemblyName)\%(RecursiveDir)" />
 	</Target>
 	
 	<Target Name="PostPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
 		<ItemGroup>
 			<CopySource Include="$(PublishDir)*.dll" />
+			<PreConfiguredFiles Include="$(ProjectDir)PreConfiguredFiles\**\*.*" />
 		</ItemGroup>
 
 		<MakeDir Directories="$(SolutionDir)@Release\$(AssemblyName)\$(AssemblyName)" />
 		<Copy SourceFiles="@(CopySource)" DestinationFolder="$(SolutionDir)@Release\$(AssemblyName)\$(AssemblyName)" />
+		<Copy SourceFiles="@(PreConfiguredFiles)" DestinationFolder="$(SolutionDir)@Release\$(AssemblyName)\$(AssemblyName)\%(RecursiveDir)" />
 		<Copy SourceFiles="$(ProjectDir)Gameplay Mod_Readme.rtf" DestinationFolder="$(SolutionDir)@Release\$(AssemblyName)" />
 		<ZipDirectory SourceDirectory="$(SolutionDir)@Release\$(AssemblyName)" DestinationFile="$(SolutionDir)@Release\$(AssemblyName)-$(AssemblyVersion).zip" Overwrite="true" />
 	</Target>

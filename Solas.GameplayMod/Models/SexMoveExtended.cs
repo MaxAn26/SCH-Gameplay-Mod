@@ -23,6 +23,7 @@ internal class SexMoveExtended : IComparable<SexMoveExtended> {
     public bool IsSmothering { get; set; }
     public bool IsUniversal { get; set; }
     public bool IsWresting { get; set; }
+    public bool IsSpanking { get; set; }
 
     [JsonIgnore]
     public bool IsForeplay => Type is >= 1 and <= 5;
