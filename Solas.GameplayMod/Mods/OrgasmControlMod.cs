@@ -6,6 +6,7 @@ using BaseMod.Core.Utils;
 using BepInEx.Configuration;
 
 using Solas.GameplayMod.Components;
+using Solas.GameplayMod.Models;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -108,14 +109,51 @@ internal class OrgasmControlMod {
             if (OrgasmControl is not OrgasmControl.None)
                 return;
 
-            if (SelfControl.Value && RandomUtils.Chance(SelfControlChance.Value)) {
+            var enemyComponent = sexSystem.Enemy.GetComponentWithCast<EnemyCharacterComponent>();
+            string enemyName = enemyComponent?.EnemyAI.enemyName ?? "Enemy";
+            var enemyPleasure = enemyComponent?.EnemyTrait?.Invulnerable ?? CharacterInvulnerable.None;
+            if (SelfControl.Value && enemyPleasure is not CharacterInvulnerable.Pleasure && RandomUtils.Chance(SelfControlChance.Value)) {
                 OrgasmControl = OrgasmControl.SelfControl;
+                string text = SexSystem.PlayerAttacker
+                    ? $"{enemyName} controls their arousal in order to climax together with you"
+                    : "You control your arousal in order to climax together with your partner";
+
+                sexSystem.console.ConsoleWrite(text);
             } else if (DeniedOrgasm.Value && RandomUtils.Chance(DeniedOrgasmChance.Value)) {
                 OrgasmControl = OrgasmControl.DeniedOrgasm;
+                string text = SexSystem.PlayerAttacker
+                    ? $"{enemyName} controls their arousal by delaying their orgasm"
+                    : "You control your arousal by delaying your orgasm";
+
+                sexSystem.console.ConsoleWrite(text);
             }
         } catch (Exception ex) {
             Plugin.Log.Error(ex.Message);
             return;
+        }
+    }
+
+    internal static void CheckOrgasmControl(int currentEcstasy, int maxEcstasy, ref int ecstasy) {
+        try {
+            if (!Enabled.Value || SexSystem.Sexstatus is not SEXSTATUS.Fucking || ecstasy <= 1)
+                return;
+
+            if (currentEcstasy > maxEcstasy * 0.85) {
+                switch (OrgasmControl) {
+                    case OrgasmControl.SelfControl:
+                        ecstasy = Mathf.RoundToInt(maxEcstasy * 0.9f); 
+                        break;
+                    case OrgasmControl.DeniedOrgasm:
+                        ecstasy = 0;
+                        ResetDeniedOrgasm();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        } catch (Exception ex) {
+            Plugin.Log.Error(ex);
         }
     }
 
@@ -137,7 +175,7 @@ internal class OrgasmControlMod {
             if (OrgasmControl is not OrgasmControl.None)
                 return false;
 
-            if (PunishmentOrgasm.Value && RandomUtils.Chance(PunishmentOrgasmChance.Value)) {
+            if (PunishmentOrgasmSprite is not null && PunishmentOrgasm.Value && RandomUtils.Chance(PunishmentOrgasmChance.Value)) {
                 OrgasmControl = OrgasmControl.PunishmentOrgasm;
                 string enemyName = sexSystem.Enemy.TryGetComponentWithCast(out EnemyAI enemyAI) ? enemyAI.enemyName : "Enemy";
                 AddIcon(sexSystem, PunishmentOrgasmSprite);

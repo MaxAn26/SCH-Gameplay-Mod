@@ -48,4 +48,11 @@ internal class GlossEffectMod {
 
         return Math.Clamp(value, BaseGloss.Value, MaxGloss.Value);
     }
+
+    internal static float GetGlossEffect(int currentTick) {
+        float inc = currentTick * 0.01f;
+        float value = BaseGloss.Value + inc;
+
+        return Math.Clamp(value, BaseGloss.Value, MaxGloss.Value);
+    }
 }

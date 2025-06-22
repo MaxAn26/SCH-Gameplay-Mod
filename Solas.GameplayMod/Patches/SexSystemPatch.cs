@@ -171,8 +171,6 @@ internal class SexSystemPatch {
     static bool SexSystemSexDamagePrefix( SexSystem __instance, bool __runOriginal ) {
         SexDamageMod.IsSexDamage = true;
         SexDamageMod.SexDamageSavePlayerEc = __instance.playerHealthSystem.CurrentEc;
-        if (SexDamageMod.ApplySexDamage())
-            return false;
 
         if(!__runOriginal)
             return false;

@@ -90,7 +90,7 @@ internal class EnemySexExtendMod {
         return Mathf.Clamp(chance, 0, 100);
     }
 
-    internal static EnemySexModel GetEnemySexTypes(int enemyTypeId) {
+    internal static EnemySexModel GetEnemySexModel(int enemyTypeId) {
         try {
             if (!Enabled.Value)
                 return null;
@@ -197,6 +197,20 @@ internal class EnemySexExtendMod {
         } catch (Exception ex) {
             Plugin.Log.Error(ex.Message);
             return false;
+        }
+    }
+
+    internal static void CheckFetishAndWeaknesses(HealthSystem healthSystem, ref int ecstasyDamage) {
+        try {
+            if (!Enabled.Value)
+                return;
+
+            if (healthSystem.gameObject.TryGetComponentWithCast(out EnemyCharacterComponent enemyCharacter)) {
+                if (IsFetishTriggered(enemyCharacter.SexSystem, enemyCharacter.EnemyFetish) || IsWeaknessesTriggered(enemyCharacter.SexSystem, enemyCharacter.AsCasterWeaknesses, enemyCharacter.AsTargetWeaknesses))
+                    ecstasyDamage = RandomUtils.Chance(20, ecstasyDamage * 2, ecstasyDamage);
+            }
+        } catch (Exception ex) {
+            Plugin.Log.Error(ex.Message);
         }
     }
 

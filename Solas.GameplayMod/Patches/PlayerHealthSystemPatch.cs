@@ -45,10 +45,9 @@ internal class PlayerHealthSystemPatch {
     [HarmonyPrefix]
     [HarmonyWrapSafe]
     [HarmonyPatch( typeof( PlayerHealthSystem ), nameof( PlayerHealthSystem.UpdateArousal ) )]
-    static bool PlayerHealthSystemUpdateArousalPrefix( bool __runOriginal, ref int __0, ref int __1 ) {
-        if (SceneManager.GetActiveScene().buildIndex > 4 && SexSystem.Sexstatus is SEXSTATUS.Fucking && !SexSystem.IsCumming && SexDamageMod.IsModActive) {
-            Plugin.Log.Info($"UpdateArousal: {__0}/{__1}");
-            return false;
+    static bool PlayerHealthSystemUpdateArousalPrefix(PlayerHealthSystem __instance, bool __runOriginal, ref int __0, ref int __1 ) {
+        if (SceneManager.GetActiveScene().buildIndex > 4 && !SexSystem.PlayerAttacker && SexSystem.Sexstatus is SEXSTATUS.Fucking && !SexSystem.IsCumming) {
+            OrgasmControlMod.CheckOrgasmControl(__instance.CurrentEc, __instance.MaxEc, ref __1);
         }
 
         if (!__runOriginal)

@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections;
 
 using BaseMod.Core.Extensions;
+using BaseMod.Core.Utils;
+
+using BepInEx.Unity.IL2CPP.Utils.Collections;
 
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
@@ -15,7 +19,7 @@ internal class PlayerCharacterComponent : MonoBehaviour {
     internal SexSystem SexSystem;
     internal PlayerCombat PlayerCombat;
 
-    internal int LastEcstasy = -1;
+    private int _glossTick = 0;
 
     #region Il2Cpp .ctor
     static PlayerCharacterComponent() {
@@ -39,31 +43,40 @@ internal class PlayerCharacterComponent : MonoBehaviour {
             } else {
                 Destroy(this);
             }
+
+            UpdateSmoothnessDeviate();
         } catch (Exception e) {
             Plugin.Log.Error(e);
             Destroy(this);
         }
     }
 
-    public void LateUpdate() {
-        if (LastEcstasy != PlayerCombat.healthSystem.CurrentAr + PlayerCombat.healthSystem.CurrentEc) {
-            UpdateSmoothnessDeviate();
+    public void Start() {
+        StartCoroutine(UpdateSmoothness().WrapToIl2Cpp());
+    }
 
-            LastEcstasy = PlayerCombat.healthSystem.CurrentAr + PlayerCombat.healthSystem.CurrentEc;
+    internal IEnumerator UpdateSmoothness() {
+        yield return new WaitForSeconds(5f);
+
+        if (!UpdateSmoothnessDeviate() && !SexSystem.GameOver){
+            _glossTick++;
+            StartCoroutine(UpdateSmoothness().WrapToIl2Cpp());
         }
     }
 
-    private void UpdateSmoothnessDeviate() {
+    private bool UpdateSmoothnessDeviate() {
         if (!GlossEffectMod.IsModActive)
-            return;
+            return true;
 
-        float gloss = GlossEffectMod.GetPlayerGlossEffect(PlayerCombat.healthSystem.CurrentAr, PlayerCombat.healthSystem.MaxAr, PlayerCombat.healthSystem.CurrentEc, PlayerCombat.healthSystem.MaxEc);
+        float gloss = GlossEffectMod.GetGlossEffect(_glossTick);
 
         UpdateMaterialPropertyBlock(PlayerCombat.playerSex.Character, 0, "_SmoothnessDeviate", gloss);
         UpdateMaterialPropertyBlock(PlayerCombat.playerSex.Character, 1, "_SmoothnessDeviate", gloss);
 
         if (CharacterData.Instance.Ismale || CharacterData.Instance.adultSettingsDATA.FutaPlayerMode)             
             UpdateMaterialPropertyBlock(PlayerCombat.playerSex.Dick, 0, "_SmoothnessDeviate", gloss);
+
+        return gloss >= GlossEffectMod.MaxGloss.Value;
     }
 
     private void UpdateMaterialPropertyBlock(Renderer renderer, int index, string property, float value) {

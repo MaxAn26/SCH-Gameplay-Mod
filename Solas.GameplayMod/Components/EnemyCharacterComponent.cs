@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 
 using BaseMod.Core.Extensions;
 using BaseMod.Core.Utils;
+
+using BepInEx.Unity.IL2CPP.Utils.Collections;
 
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
@@ -25,7 +28,7 @@ internal class EnemyCharacterComponent : MonoBehaviour {
     internal int CorruptionChance;
 
     internal bool? IsActive;
-    internal int LastEcstasy = -1;
+    private int _glossTick = 0;
 
     #region Il2Cpp .ctor
     static EnemyCharacterComponent() {
@@ -64,7 +67,7 @@ internal class EnemyCharacterComponent : MonoBehaviour {
             }
 
             if (EnemySexExtendMod.IsModActive) {
-                var sexTypes = EnemySexExtendMod.GetEnemySexTypes(EnemyAI.typeOfEnemy);
+                var sexTypes = EnemySexExtendMod.GetEnemySexModel(EnemyAI.typeOfEnemy);
                 if (sexTypes is not null) {
                     EnemySexTypes = sexTypes;
                     EnemyFetish = RandomUtils.Flag(EnemySexTypes.AllowedFetishes);
@@ -78,26 +81,32 @@ internal class EnemyCharacterComponent : MonoBehaviour {
             Destroy(this);
         }
     }
+    public void Start() {
+        StartCoroutine(UpdateSmoothness().WrapToIl2Cpp());
+    }
 
-    public void LateUpdate() {
-        if (LastEcstasy != EnemyAI.healthSystem.CurrentEc) {
-            UpdateSmoothnessDeviate();
+    internal IEnumerator UpdateSmoothness() {
+        yield return new WaitForSeconds(5f);
 
-            LastEcstasy = EnemyAI.healthSystem.CurrentEc;
+        if (!UpdateSmoothnessDeviate() && !EnemyAI.isDead && !SexSystem.GameOver) {
+            _glossTick++;
+            StartCoroutine(UpdateSmoothness().WrapToIl2Cpp());
         }
     }
 
-    private void UpdateSmoothnessDeviate() {
-        if (!EnemyAI.EnSex.IsGrappled || !GlossEffectMod.IsModActive)
-            return;
+    private bool UpdateSmoothnessDeviate() {
+        if (!GlossEffectMod.IsModActive)
+            return true;
 
-        float gloss = GlossEffectMod.GetEnemyGlossEffect(EnemyAI.healthSystem.CurrentEc, EnemyAI.healthSystem.MaxEc);
+        float gloss = GlossEffectMod.GetGlossEffect(_glossTick);
 
         UpdateMaterialPropertyBlock(EnemyAI.EnSex.Character, 0, "_SmoothnessDeviate", gloss);
         UpdateMaterialPropertyBlock(EnemyAI.EnSex.Character, 1, "_SmoothnessDeviate", gloss);
 
-        if (EnemyAI.EnSex.EnemyFuta || EnemyAI.EnSex.EnemyMale)             
+        if (EnemyAI.EnSex.EnemyFuta || EnemyAI.EnSex.EnemyMale)
             UpdateMaterialPropertyBlock(EnemyAI.EnSex.Dick, 0, "_SmoothnessDeviate", gloss);
+
+        return gloss >= GlossEffectMod.MaxGloss.Value;
     }
 
     private void UpdateMaterialPropertyBlock(Renderer renderer, int index, string property, float value) {

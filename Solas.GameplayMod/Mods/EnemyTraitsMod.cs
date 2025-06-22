@@ -7,6 +7,7 @@ using BaseMod.Core.Utils;
 
 using BepInEx.Configuration;
 
+using Solas.GameplayMod.Components;
 using Solas.GameplayMod.Models;
 
 namespace Solas.GameplayMod.Mods;
@@ -98,7 +99,12 @@ internal class EnemyTraitsMod {
 
             if (enemyTrait.RegenerationOperation is not TraitOperation.None) {
                 int newValue = enemyTrait.CalculateValue(enemyTrait.RegenerationOperation, enemyAI.healthSystem.Regeneration, enemyTrait.RegenerationValue);
+
+                int oldValue = enemyAI.healthSystem.Regeneration;
                 enemyAI.healthSystem.Regeneration = newValue;
+
+                if (oldValue == 0)
+                    enemyAI.healthSystem.StartCoroutine(enemyAI.healthSystem.RegenerationMotor());
             }
 
             if (enemyTrait.PowerOperation is not TraitOperation.None) {
@@ -126,6 +132,40 @@ internal class EnemyTraitsMod {
         }
     }
 
+    internal static void HealthDamage(HealthSystem healthSystem, ref int damage) {
+        try {
+            if (!Enabled.Value || SexSystem.Sexstatus is not SEXSTATUS.Fucking)
+                return;
+
+            if (!healthSystem.gameObject.TryGetComponentWithCast(out EnemyCharacterComponent enemyCharacter))
+                return;
+
+            if (enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.Invulnerable is CharacterInvulnerable.SexHealth) {
+                damage = 0;
+            }
+
+        } catch (Exception ex) {
+            Plugin.Log.Error(ex);
+        }
+    }
+
+    internal static void ArousalDamage(HealthSystem healthSystem, ref int damage) {
+        try {
+            if (!Enabled.Value || SexSystem.Sexstatus is not SEXSTATUS.Fucking)
+                return;
+
+            if (!healthSystem.gameObject.TryGetComponentWithCast(out EnemyCharacterComponent enemyCharacter))
+                return;
+
+            if (enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.Invulnerable is CharacterInvulnerable.Pleasure) {
+                damage = 0;
+            }
+
+        } catch (Exception ex) {
+            Plugin.Log.Error(ex);
+        }
+    }
+
     internal static void Reset() {
         EnhancedCount = 0;
         MiniBossCount = 0;
@@ -146,7 +186,19 @@ internal class EnemyTraitsMod {
                 RestraintChanceOperation = TraitOperation.Replace,
                 RestraintChanceValue = 0,
                 RegenerationOperation = TraitOperation.Replace,
-                RegenerationValue = 0,
+                RegenerationValue = 2,
+            },
+            new() {
+                Name = "SexDrone",
+                TraitType = TraitType.MiniBoss,
+                Invulnerable = CharacterInvulnerable.Pleasure,
+                HealthOperation = TraitOperation.Random,
+                PowerOperation = TraitOperation.Replace,
+                PowerValue = 10,
+                RestraintChanceOperation = TraitOperation.Replace,
+                RestraintChanceValue = 0,
+                RegenerationOperation = TraitOperation.Replace,
+                RegenerationValue = 2,
             },
         ];
 

@@ -11,7 +11,7 @@
 		</RestoreAdditionalProjectSources>
 		<RootNamespace>Solas.GameplayMod</RootNamespace>
 		<DebugType>embedded</DebugType>
-		<Platforms>AnyCPU;x64</Platforms>
+		<Platforms>x64</Platforms>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -74,7 +74,7 @@
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<ItemGroup>
-			<CopySource Include="$(PublishDir)*.dll" />
+			<CopySource Include="$(TargetDir)*.dll" />
 			<PreConfiguredFiles Include="$(ProjectDir)PreConfiguredFiles\**\*.*" />
 		</ItemGroup>
 
