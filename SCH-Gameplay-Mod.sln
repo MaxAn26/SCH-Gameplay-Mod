@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseMod.Core", "BaseMod.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solas.GameplayMod", "Solas.GameplayMod\Solas.GameplayMod.csproj", "{F4BB061D-35D3-4F0F-AB57-BFF27A0E3649}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solas.DirtyTalkMod", "Solas.DirtyTalkMod\Solas.DirtyTalkMod.csproj", "{8A112996-29C5-403F-BA2B-36E111D41B7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,9 @@ Global
 		{F4BB061D-35D3-4F0F-AB57-BFF27A0E3649}.Debug|x64.Build.0 = Debug|x64
 		{F4BB061D-35D3-4F0F-AB57-BFF27A0E3649}.Release|x64.ActiveCfg = Release|x64
 		{F4BB061D-35D3-4F0F-AB57-BFF27A0E3649}.Release|x64.Build.0 = Release|x64
+		{8A112996-29C5-403F-BA2B-36E111D41B7E}.Debug|x64.ActiveCfg = Debug|x64
+		{8A112996-29C5-403F-BA2B-36E111D41B7E}.Debug|x64.Build.0 = Debug|x64
+		{8A112996-29C5-403F-BA2B-36E111D41B7E}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
