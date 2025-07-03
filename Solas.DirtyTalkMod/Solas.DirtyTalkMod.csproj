@@ -75,6 +75,7 @@
 
 	<ItemGroup>
 	  <Folder Include="PreConfiguredFiles\Configs\" />
+		<Content Include="PreConfiguredFiles\**\*" CopyToPublishDirectory="Never" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
