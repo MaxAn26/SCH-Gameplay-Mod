@@ -6,8 +6,6 @@ using BaseMod.Core.Utils;
 
 using BepInEx.Configuration;
 
-using Solas.GameplayMod.Components;
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,7 +13,6 @@ namespace Solas.GameplayMod.Mods;
 internal class SexDamageMod {
     #region Configuration
     internal static ConfigEntry<bool> Enabled;
-    internal static ConfigEntry<bool> SexFight;
     internal static ConfigEntry<bool> OnPlayerCum;
     internal static ConfigEntry<bool> ExtraDamage;
     #endregion
@@ -41,14 +38,12 @@ internal class SexDamageMod {
         try {
             Enabled = config.Bind(nameof(SexDamageMod), nameof(Enabled), false,
                 new ConfigDescription("Activates the modification", new AcceptableValueList<bool>([true, false])));
-            SexFight = config.Bind(nameof(SexDamageMod), nameof(SexFight), true,
-                new ConfigDescription("Block damage during the struggle for dominance", new AcceptableValueList<bool>([true, false])));
             OnPlayerCum = config.Bind(nameof(SexDamageMod), nameof(OnPlayerCum), true,
                 new ConfigDescription("Activate control for player's climax", new AcceptableValueList<bool>([true, false])));
             ExtraDamage = config.Bind(nameof(SexDamageMod), nameof(ExtraDamage), true,
                 new ConfigDescription("The player will take additional damage from vibrator and \"fatigue\"", new AcceptableValueList<bool>([true, false])));
 
-            if (!SexFight.Value && !OnPlayerCum.Value && !ExtraDamage.Value)
+            if (!OnPlayerCum.Value && !ExtraDamage.Value)
                 Enabled.Value = false;
         } catch (Exception ex) {
             Plugin.Log.Error(ex.Message);
