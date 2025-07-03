@@ -1,0 +1,10 @@
+{
+  "OnHandRestraints": true,
+  "PlayerVictimOnHandRestraints": true,
+  "AtSameRole": true,
+  "PlayerVictimAtSameRole": true,
+  "AtSameGender": false,
+  "PlayerVictimAtSameGender": false,
+  "RandomByEnemyPower": true,
+  "PlayerVictimRandomByEnemyPower": false
+}
