@@ -18,6 +18,7 @@
 		<MainVersion>1.0</MainVersion>
 		<BuildVersion>$([System.DateTime]::UtcNow.ToString(yy))$([System.DateTime]::UtcNow.DayOfYear.ToString(000))</BuildVersion>
 		<VersionTime>$([System.DateTime]::UtcNow.ToString(HHmm))</VersionTime>
+		<SolutionDir>$(ProjectDir)../</SolutionDir>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -85,8 +86,6 @@
 		<MakeDir Directories="$(SolutionDir)@Mods\$(AssemblyName)" />
 		<Copy SourceFiles="@(CopySource)" DestinationFolder="$(SolutionDir)@Mods\$(AssemblyName)" />
 		<Copy SourceFiles="@(PreConfiguredFiles)" DestinationFolder="$(SolutionDir)@Mods\$(AssemblyName)\%(RecursiveDir)" />
-
-		<!--<Exec WorkingDirectory="$(SolutionDir)" Command="mkdir &quot;@Mods/$(TargetName)&quot;&#xD;&#xA;&#xD;&#xA;xcopy &quot;$(TargetDir)*.dll&quot; &quot;@Mods/$(TargetName)&quot; /Y&#xD;&#xA;&#xD;&#xA;if %25errorlevel%25 leq 4 exit 0 else exit %25errorlevel%25" />-->
 	</Target>
 	
 	<Target Name="PostPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
