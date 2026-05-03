@@ -1,38 +1,42 @@
-﻿using System;
-
-using BaseMod.Core.Extensions;
-
-using BepInEx.Configuration;
+using BaseMod.Core;
+using MelonLoader;
+using static BaseMod.Core.ModConfig;
 
 namespace Solas.GameplayMod.Mods;
-internal class GlossEffectMod {
+internal class GlossEffectMod
+{
     #region Configuration
-    internal static ConfigEntry<bool> Enabled;
-    internal static ConfigEntry<float> BaseGloss;
-    internal static ConfigEntry<float> MaxGloss;
-    internal static ConfigEntry<float> PlayerArousalWeightFactor;
+    internal static MelonPreferences_Entry<bool> Enabled;
+    internal static MelonPreferences_Entry<float> BaseGloss;
+    internal static MelonPreferences_Entry<float> MaxGloss;
+    internal static MelonPreferences_Entry<float> PlayerArousalWeightFactor;
     #endregion
 
     #region States
     internal static bool IsModActive => Enabled.Value;
     #endregion
 
-    internal static void Load(ConfigFile config) {
-        try {
-            Enabled = config.Bind(nameof(GlossEffectMod), nameof(Enabled), false,
-                new ConfigDescription("Activates the modification", new AcceptableValueList<bool>([true, false])));
-            BaseGloss = config.Bind(nameof(GlossEffectMod), nameof(BaseGloss), 0.1f,
-                new ConfigDescription("Base game gloss value", new AcceptableValueRange<float>(0.0f, 1.0f)));
-            MaxGloss = config.Bind(nameof(GlossEffectMod), nameof(MaxGloss), 0.3f,
-                new ConfigDescription("Maximum gloss value", new AcceptableValueRange<float>(0.0f, 1.0f)));
-            PlayerArousalWeightFactor = config.Bind(nameof(GlossEffectMod), nameof(PlayerArousalWeightFactor), 0.65f,
-                new ConfigDescription("Player arousal weight factor (higher values increase Arousal's influence, while the remainder goes to Ecstasy automatically)", new AcceptableValueRange<float>(0.0f, 1.0f)));
-        } catch (Exception ex) {
-            Plugin.Log.Error(ex.Message);
+    internal static void Load(ModConfig config)
+    {
+        try
+        {
+            Enabled = config.Entry(nameof(GlossEffectMod), nameof(Enabled), false,
+                "Activates the modification", new AcceptableValueList<bool>([true, false]));
+            BaseGloss = config.Entry(nameof(GlossEffectMod), nameof(BaseGloss), 0.1f,
+                "Base game gloss value", new AcceptableValueRange<float>(0.0f, 1.0f));
+            MaxGloss = config.Entry(nameof(GlossEffectMod), nameof(MaxGloss), 0.3f,
+                "Maximum gloss value", new AcceptableValueRange<float>(0.0f, 1.0f));
+            PlayerArousalWeightFactor = config.Entry(nameof(GlossEffectMod), nameof(PlayerArousalWeightFactor), 0.65f,
+                "Player arousal weight factor (higher values increase Arousal's influence, while the remainder goes to Ecstasy automatically)", new AcceptableValueRange<float>(0.0f, 1.0f));
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static float GetPlayerGlossEffect(int currentArousal, int maxArousal, int currentEcstasy, int maxEcstasy) {
+    internal static float GetPlayerGlossEffect(int currentArousal, int maxArousal, int currentEcstasy, int maxEcstasy)
+    {
         float ecstasyWeight = 1.0f - PlayerArousalWeightFactor.Value;
         float level = PlayerArousalWeightFactor.Value * ((float)currentArousal / maxArousal)
                     + ecstasyWeight * ((float)currentEcstasy / maxEcstasy);
@@ -42,14 +46,16 @@ internal class GlossEffectMod {
         return Math.Clamp(value, BaseGloss.Value, MaxGloss.Value);
     }
 
-    internal static float GetEnemyGlossEffect(int currentEcstasy, int maxEcstasy) {
+    internal static float GetEnemyGlossEffect(int currentEcstasy, int maxEcstasy)
+    {
         float level = (float)currentEcstasy / maxEcstasy;
         float value = BaseGloss.Value + level * (MaxGloss.Value - BaseGloss.Value);
 
         return Math.Clamp(value, BaseGloss.Value, MaxGloss.Value);
     }
 
-    internal static float GetGlossEffect(int currentTick) {
+    internal static float GetGlossEffect(int currentTick)
+    {
         float inc = currentTick * 0.01f;
         float value = BaseGloss.Value + inc;
 

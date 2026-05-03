@@ -1,17 +1,16 @@
-﻿using System;
-
-using BaseMod.Core.Extensions;
+using BaseMod.Core;
 using BaseMod.Core.Utils;
-
-using BepInEx.Configuration;
-
+using Il2Cpp;
+using MelonLoader;
 using UnityEngine.SceneManagement;
+using static BaseMod.Core.ModConfig;
 
 namespace Solas.GameplayMod.Mods;
-internal class ExtraBondageTrapMod {
+internal class ExtraBondageTrapMod
+{
     #region Configuration
-    internal static ConfigEntry<bool> Enabled;
-    internal static ConfigEntry<int> Chance;
+    internal static MelonPreferences_Entry<bool> Enabled;
+    internal static MelonPreferences_Entry<int> Chance;
     #endregion
 
     #region States
@@ -22,37 +21,52 @@ internal class ExtraBondageTrapMod {
     internal static CharacterData.StatusData CharacterStatus => CharacterData.Instance.statusDATA;
     #endregion
 
-    internal static void Load(ConfigFile config) {
-        try {
-            Enabled = config.Bind(nameof(ExtraBondageTrapMod), nameof(Enabled), false,
-                new ConfigDescription("Activates the modification", new AcceptableValueList<bool>([true, false])));
-            Chance = config.Bind(nameof(ExtraBondageTrapMod), nameof(Chance), 20,
-                new ConfigDescription("Chance to put extra bondage or take damage", new AcceptableValueRange<int>(0, 100)));
+    internal static void Load(ModConfig config)
+    {
+        try
+        {
+            Enabled = config.Entry(nameof(ExtraBondageTrapMod), nameof(Enabled), false,
+                "Activates the modification", new AcceptableValueList<bool>([true, false]));
+            Chance = config.Entry(nameof(ExtraBondageTrapMod), nameof(Chance), 20,
+                "Chance to put extra bondage or take damage", new AcceptableValueRange<int>(0, 100));
 
-        } catch (Exception ex) {
-            Plugin.Log.Error(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static void Apply(SexSystem sexSystem) {
-        try {
+    internal static void Apply(SexSystem sexSystem)
+    {
+        try
+        {
             if (!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
+            {
                 return;
+            }
 
-            if(!RandomUtils.Chance(Chance.Value))
+            if (!RandomUtils.Chance(Chance.Value))
+            {
                 return;
+            }
 
-            if(CharacterStatus.IsBoundBlindfold != 0 && CharacterStatus.IsBoundCollar != 0 
+            if (CharacterStatus.IsBoundBlindfold != 0 && CharacterStatus.IsBoundCollar != 0
                 && CharacterStatus.IsBoundGag != 0 && CharacterStatus.IsBoundHandRestraint != 0
                 && CharacterStatus.IsBoundHarness != 0 && CharacterStatus.IsBoundLegRestraint != 0
-                && CharacterStatus.IsBoundNippleClamps != 0 && CharacterStatus.IsBoundPlug != 0 && CharacterStatus.IsBoundVibrator != 0) {
-                int damage = Convert.ToInt32( Math.Round(sexSystem.playerHealthSystem.CurrentHp * 0.8));
+                && CharacterStatus.IsBoundNippleClamps != 0 && CharacterStatus.IsBoundPlug != 0 && CharacterStatus.IsBoundVibrator != 0)
+            {
+                int damage = Convert.ToInt32(Math.Round(sexSystem.playerHealthSystem.CurrentHp * 0.8));
                 sexSystem.playerHealthSystem.SubstractHealth(damage);
-            } else {
+            }
+            else
+            {
                 sexSystem.BoundPlayer();
             }
-        } catch (Exception ex) {
-            Plugin.Log.Error(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
             return;
         }
     }

@@ -1,7 +1,8 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Solas.DirtyTalkMod.Models;
-public enum CharacterGender {
+public enum CharacterGender
+{
     None,
     [EnumMember]
     Female,

@@ -1,17 +1,16 @@
-﻿using System;
-
-using BaseMod.Core.Extensions;
-
-using BepInEx.Configuration;
-
+using BaseMod.Core;
+using Il2Cpp;
+using MelonLoader;
 using UnityEngine.SceneManagement;
+using static BaseMod.Core.ModConfig;
 
 namespace Solas.GameplayMod.Mods;
-internal class SexInitiatorStateMod {
+internal class SexInitiatorStateMod
+{
     #region Configuration
-    internal static ConfigEntry<bool> Enabled;
-    internal static ConfigEntry<bool> DisableAsSameRole;
-    internal static ConfigEntry<bool> DisableWhenBound;
+    internal static MelonPreferences_Entry<bool> Enabled;
+    internal static MelonPreferences_Entry<bool> DisableAsSameRole;
+    internal static MelonPreferences_Entry<bool> DisableWhenBound;
     #endregion
 
     #region States
@@ -24,57 +23,83 @@ internal class SexInitiatorStateMod {
     internal static SexSystem SexSystem = null;
     #endregion
 
-    internal static void Load( ConfigFile config ) {
-        try {
-            Enabled = config.Bind( nameof( SexInitiatorStateMod ), nameof( Enabled ), false,
-                new ConfigDescription( "Activates the modification", new AcceptableValueList<bool>( [true, false] ) ) );
-            DisableAsSameRole = config.Bind( nameof( SexInitiatorStateMod ), nameof( DisableAsSameRole ), true,
-                new ConfigDescription( "The player will not gain the Initiator role if the enemy’s role matches the player’s role", new AcceptableValueList<bool>( [true, false] ) ) );
-            DisableWhenBound = config.Bind( nameof( SexInitiatorStateMod ), nameof( DisableWhenBound ), true,
-                new ConfigDescription( "The player will not gain the Initiator role if their hands are bound", new AcceptableValueList<bool>( [true, false] ) ) );
+    internal static void Load(ModConfig config)
+    {
+        try
+        {
+            Enabled = config.Entry(nameof(SexInitiatorStateMod), nameof(Enabled), false,
+                "Activates the modification", new AcceptableValueList<bool>([true, false]));
+            DisableAsSameRole = config.Entry(nameof(SexInitiatorStateMod), nameof(DisableAsSameRole), true,
+                "The player will not gain the Initiator role if the enemy’s role matches the player’s role", new AcceptableValueList<bool>([true, false]));
+            DisableWhenBound = config.Entry(nameof(SexInitiatorStateMod), nameof(DisableWhenBound), true,
+                "The player will not gain the Initiator role if their hands are bound", new AcceptableValueList<bool>([true, false]));
 
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex.Message );
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static void Apply() {
-        try {
-            if(!Enabled.Value || SexSystem is null || SceneManager.GetActiveScene().buildIndex <= 4)
+    internal static void Apply()
+    {
+        try
+        {
+            if (!Enabled.Value || SexSystem is null || SceneManager.GetActiveScene().buildIndex <= 4)
+            {
                 return;
+            }
 
             IsAttacker = false;
-            if(SexSystem.IsThreesome || Character.adultSettingsDATA.CounterVictim)
+            if (SexSystem.IsThreesome || Character.adultSettingsDATA.CounterVictim)
+            {
                 return;
+            }
 
-            if(Character.statusDATA.IsBoundHeavyRestraint > 0)
+            if (Character.statusDATA.IsBoundHeavyRestraint > 0)
+            {
                 return;
+            }
 
-            if(DisableAsSameRole.Value && SexSystem.TargetActive == SexSystem.CasterActive)
+            if (DisableAsSameRole.Value && SexSystem.TargetActive == SexSystem.CasterActive)
+            {
                 return;
+            }
 
-            if(DisableWhenBound.Value && Character.statusDATA.IsBoundHandRestraint > 0)
+            if (DisableWhenBound.Value && Character.statusDATA.IsBoundHandRestraint > 0)
+            {
                 return;
+            }
 
-            if(SexSystem.playerHealthSystem.CurrentEc >= SexSystem.playerHealthSystem.MaxEc)
+            if (SexSystem.playerHealthSystem.CurrentEc >= SexSystem.playerHealthSystem.MaxEc)
+            {
                 IsAttacker = false;
-            else if(SexSystem.enemyHealthSystem.CurrentEc >= SexSystem.enemyHealthSystem.MaxEc)
+            }
+            else if (SexSystem.enemyHealthSystem.CurrentEc >= SexSystem.enemyHealthSystem.MaxEc)
+            {
                 IsAttacker = true;
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex.Message );
+            }
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static void SetInitiator( SexSystem sexSystem ) {
+    internal static void SetInitiator(SexSystem sexSystem)
+    {
         SexSystem ??= sexSystem;
 
-        if(SexSystem.IsThreesome) {
+        if (SexSystem.IsThreesome)
+        {
             SexSystem.PlayerAttacker = false;
             return;
         }
 
-        if(IsAttacker is not null)
+        if (IsAttacker is not null)
+        {
             SexSystem.PlayerAttacker = IsAttacker.Value;
+        }
     }
 
     internal static void ResetMod() => IsAttacker = null;

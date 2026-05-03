@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
+using BaseMod.Core;
 using BaseMod.Core.Extensions;
 using BaseMod.Core.Utils;
-
-using BepInEx.Configuration;
-
+using Il2Cpp;
 using Il2CppInterop.Runtime;
-
+using MelonLoader;
 using Solas.GameplayMod.Components;
 using Solas.GameplayMod.Models;
 
@@ -16,12 +11,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Solas.GameplayMod.Mods;
-internal class SexMoveChoiceMod {
+internal class SexMoveChoiceMod
+{
     #region Configuration
-    internal static ConfigEntry<bool> Enabled;
-    internal static ConfigEntry<bool> ArousalExtention;
-    internal static ConfigEntry<bool> UsePlayerPreferredPositions;
-    internal static ConfigEntry<bool> UsePoseSelectionSystem;
+    internal static MelonPreferences_Entry<bool> Enabled;
+    internal static MelonPreferences_Entry<bool> ArousalExtention;
+    internal static MelonPreferences_Entry<bool> UsePlayerPreferredPositions;
+    internal static MelonPreferences_Entry<bool> UsePoseSelectionSystem;
     #endregion
 
     #region States
@@ -36,145 +32,215 @@ internal class SexMoveChoiceMod {
     internal static SexMoveExtended LastSexMove;
     #endregion
 
-    internal static void Load(ConfigFile config) {
-        try {
-            Enabled = config.Bind(nameof(SexMoveChoiceMod), nameof(Enabled), false,
-                new ConfigDescription("Activates the modification", new AcceptableValueList<bool>([true, false])));
-            ArousalExtention = config.Bind(nameof(SexMoveChoiceMod), nameof(ArousalExtention), true,
-                new ConfigDescription("Gain arousal according with animation", new AcceptableValueList<bool>([true, false])));
-            UsePlayerPreferredPositions = config.Bind(nameof(SexMoveChoiceMod), nameof(UsePlayerPreferredPositions), false,
-                new ConfigDescription("ONLY use preferred positions for player", new AcceptableValueList<bool>([true, false])));
-            UsePoseSelectionSystem = config.Bind(nameof(SexMoveChoiceMod), nameof(UsePoseSelectionSystem), true,
-                new ConfigDescription("Use position selection system. Than lower target aroused then higher chance to start a foreplay", new AcceptableValueList<bool>([true, false])));
+    internal static void Load(ModConfig config)
+    {
+        try
+        {
+            Enabled = config.Entry(nameof(SexMoveChoiceMod), nameof(Enabled), false,
+                "Activates the modification", new ModConfig.AcceptableValueList<bool>([true, false]));
+            ArousalExtention = config.Entry(nameof(SexMoveChoiceMod), nameof(ArousalExtention), true,
+                "Gain arousal according with animation", new ModConfig.AcceptableValueList<bool>([true, false]));
+            UsePlayerPreferredPositions = config.Entry(nameof(SexMoveChoiceMod), nameof(UsePlayerPreferredPositions), false,
+                "ONLY use preferred positions for player", new ModConfig.AcceptableValueList<bool>([true, false]));
+            UsePoseSelectionSystem = config.Entry(nameof(SexMoveChoiceMod), nameof(UsePoseSelectionSystem), true,
+                "Use position selection system. Than lower target aroused then higher chance to start a foreplay", new ModConfig.AcceptableValueList<bool>([true, false]));
 
-        } catch (Exception ex) {
-            Plugin.Log.Error(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static void Prepare() {
-        try {
+    internal static void Prepare()
+    {
+        try
+        {
             bool fromFile = false;
-            if (JsonUtils.TryDeserialize(Plugin.PluginResources, "SexMoves.json", out List<SexMoveExtended> extendedSexMoves)) {
+            if (JsonUtils.TryDeserialize(GameplayMod.PluginResources, "SexMoves.json", out List<SexMoveExtended> extendedSexMoves))
+            {
                 fromFile = true;
-            } else {
+            }
+            else
+            {
                 extendedSexMoves = GetExtendedSexMoves();
             }
 
-            if (!fromFile) {
-                Plugin.Log.Info("Creating SexMoves.json...");
+            if (!fromFile)
+            {
+                GameplayMod.Log.Msg("Creating SexMoves.json...");
                 List<SexMoveExtended> poses = [];
 
-                Plugin.Log.Info("Try find SexMoves in Resources");
-                var sexMoveObj = Resources.FindObjectsOfTypeAll( Il2CppType.From( typeof(SexMove) ) );
-                foreach (var moveObj in sexMoveObj) {
-                    var sexMove = moveObj.TryCast<SexMove>();
-                    if (sexMove is not null) {
-                        var move = extendedSexMoves.FirstOrDefault( em => em.ID == sexMove.ID );
-                        if (move is not null) {
+                GameplayMod.Log.Msg("Try find SexMoves in Resources");
+                Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> sexMoveObj = Resources.FindObjectsOfTypeAll(Il2CppType.From(typeof(SexMove)));
+                foreach (UnityEngine.Object moveObj in sexMoveObj)
+                {
+                    SexMove sexMove = moveObj.TryCast<SexMove>();
+                    if (sexMove is not null)
+                    {
+                        SexMoveExtended move = extendedSexMoves.FirstOrDefault(em => em.ID == sexMove.ID);
+                        if (move is not null)
+                        {
                             move.Name = sexMove.Name;
                             poses.Add(move);
                         }
                     }
                 }
-                Plugin.Log.Info($"Add {poses.Count}/{sexMoveObj.Count}");
+                GameplayMod.Log.Msg($"Add {poses.Count}/{sexMoveObj.Count}");
 
                 poses.Sort();
-                if (JsonUtils.TrySerialize(Plugin.PluginResources, "SexMoves.json", poses)) {
+                if (JsonUtils.TrySerialize(GameplayMod.PluginResources, "SexMoves.json", poses))
+                {
                     extendedSexMoves = poses;
-                    Plugin.Log.Info($"SexMoves.json was created in {Plugin.PluginResources}");
-                } else {
-                    Plugin.Log.Info($"SexMoves.json was not created");
+                    GameplayMod.Log.Msg($"SexMoves.json was created in {GameplayMod.PluginResources}");
+                }
+                else
+                {
+                    GameplayMod.Log.Msg($"SexMoves.json was not created");
                 }
             }
 
             if (extendedSexMoves.Count > 0)
+            {
                 SexMoves.Clear();
-
-            foreach (var sexMove in extendedSexMoves) {
-                if (!Character.statusDATA.DislikedSex.Contains(sexMove.ID))
-                    SexMoves.Add(sexMove);
             }
-        } catch (Exception ex) {
-            Plugin.Log.Error(ex.Message);
+
+            foreach (SexMoveExtended sexMove in extendedSexMoves)
+            {
+                if (!Character.statusDATA.DislikedSex.Contains(sexMove.ID))
+                {
+                    SexMoves.Add(sexMove);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static void SetSexID() {
-        try {
+    internal static void SetSexID()
+    {
+        try
+        {
             if (!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
+            {
                 return;
+            }
 
             if (SexSystem is null)
+            {
                 return;
+            }
 
             if (SexMoves.Count == 0)
+            {
                 return;
+            }
 
-            var move = GetSexMove();
+            SexMoveExtended move = GetSexMove();
             InteractionCounts++;
 
-            if (move is null) {
-                Plugin.Log.Info("SexMove is NULL");
+            if (move is null)
+            {
+                GameplayMod.Log.Msg("SexMove is NULL");
                 return;
             }
 
-            Plugin.Log.Info($"Set SexMove: ID: {move.ID}({move.Type}) Name: '{move.Name}'");
-            if (SexSystem.IsThreesome) {
+            GameplayMod.Log.Msg($"Set SexMove: ID: {move.ID}({move.Type}) Name: '{move.Name}'");
+            if (SexSystem.IsThreesome)
+            {
                 SexSystem.SexType = move.Type;
-            } else{
+            }
+            else
+            {
                 SexSystem.SexID = move.ID;
             }
-        } catch (Exception ex) {
-            Plugin.Log.Error(ex);
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex);
         }
     }
 
-    internal static void CheckPlayerArousal(ref int ecstasy) {
-        try {
+    internal static void CheckPlayerArousal(ref int ecstasy)
+    {
+        try
+        {
             if (!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
+            {
                 return;
+            }
 
             if (!ArousalExtention.Value)
+            {
                 return;
+            }
 
             if (SexSystem is null || SexSystem.IsThreesome || SexSystem.SexType is 0 or > 8 || !SexSystem.Player.TryGetComponentWithCast(out PlayerHealthSystem playerHealthSystem))
+            {
                 return;
+            }
 
             if (LastSexMove is null)
+            {
                 return;
+            }
 
-            if (playerHealthSystem.CurrentAr < playerHealthSystem.MaxAr) {
+            if (playerHealthSystem.CurrentAr < playerHealthSystem.MaxAr)
+            {
                 return;
             }
 
             CharacterCumCondition cumCondition = SexSystem.PlayerAttacker ? LastSexMove.CasterCum : LastSexMove.TargetCum;
 
-            if (!cumCondition.HasFlag(CharacterCumCondition.Always)) {
-                if (cumCondition.HasFlag(CharacterCumCondition.SexToy)) {
+            if (!cumCondition.HasFlag(CharacterCumCondition.Always))
+            {
+                if (cumCondition.HasFlag(CharacterCumCondition.SexToy))
+                {
                     if (Character.statusDATA.IsBoundVibrator == 0 && Character.statusDATA.IsBoundPlug == 0 && Character.statusDATA.IsBoundNippleClamps == 0)
+                    {
                         ecstasy = 0;
-                } else {
-                    switch (SexSystem.Stage) {
+                    }
+                }
+                else
+                {
+                    switch (SexSystem.Stage)
+                    {
                         case 1:
                             if (!cumCondition.HasFlag(CharacterCumCondition.Dominated) && !cumCondition.HasFlag(CharacterCumCondition.FullDominated))
+                            {
                                 ecstasy = RandomUtils.Chance(30, 1, 0);
+                            }
+
                             break;
                         case 2:
                             if (!cumCondition.HasFlag(CharacterCumCondition.Dominated) && !cumCondition.HasFlag(CharacterCumCondition.PreDominated))
+                            {
                                 ecstasy = RandomUtils.Chance(30, 1, 0);
+                            }
+
                             break;
                         case 3:
                             if (!cumCondition.HasFlag(CharacterCumCondition.Idle))
+                            {
                                 ecstasy = RandomUtils.Chance(30, 1, 0);
+                            }
+
                             break;
                         case 4:
                             if (!cumCondition.HasFlag(CharacterCumCondition.Dominating) && !cumCondition.HasFlag(CharacterCumCondition.PreDominating))
+                            {
                                 ecstasy = RandomUtils.Chance(30, 1, 0);
+                            }
+
                             break;
                         case 5:
                             if (!cumCondition.HasFlag(CharacterCumCondition.Dominating) && !cumCondition.HasFlag(CharacterCumCondition.FullDominating))
+                            {
                                 ecstasy = RandomUtils.Chance(30, 1, 0);
+                            }
+
                             break;
                         default:
                             break;
@@ -182,105 +248,162 @@ internal class SexMoveChoiceMod {
                 }
             }
 
-        } catch (Exception ex) {
-            Plugin.Log.Error(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static void CheckEnemyArousal(ref int damage) {
-        try {
+    internal static void CheckEnemyArousal(ref int damage)
+    {
+        try
+        {
             if (!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
+            {
                 return;
+            }
 
             if (!ArousalExtention.Value)
+            {
                 return;
+            }
 
             if (SexSystem is null || SexSystem.IsThreesome || SexSystem.SexType is 0 or > 8 || SexSystem.Sexstatus is not SEXSTATUS.Fucking)
+            {
                 return;
+            }
 
             if (LastSexMove is null)
+            {
                 return;
+            }
 
             CharacterCumCondition cumCondition = !SexSystem.PlayerAttacker ? LastSexMove.CasterCum : LastSexMove.TargetCum;
 
-            if (!cumCondition.HasFlag(CharacterCumCondition.Always)) {
-                switch (SexSystem.Stage) {
+            if (!cumCondition.HasFlag(CharacterCumCondition.Always))
+            {
+                switch (SexSystem.Stage)
+                {
                     case 1:
                         if (!cumCondition.HasFlag(CharacterCumCondition.Dominated) && !cumCondition.HasFlag(CharacterCumCondition.FullDominated))
+                        {
                             damage = RandomUtils.Chance(30, 1, 0);
+                        }
+
                         break;
                     case 2:
                         if (!cumCondition.HasFlag(CharacterCumCondition.Dominated) && !cumCondition.HasFlag(CharacterCumCondition.PreDominated))
+                        {
                             damage = RandomUtils.Chance(30, 1, 0);
+                        }
+
                         break;
                     case 3:
                         if (!cumCondition.HasFlag(CharacterCumCondition.Idle))
+                        {
                             damage = RandomUtils.Chance(30, 1, 0);
+                        }
+
                         break;
-                    case 4 :
+                    case 4:
                         if (!cumCondition.HasFlag(CharacterCumCondition.Dominating) && !cumCondition.HasFlag(CharacterCumCondition.PreDominating))
+                        {
                             damage = RandomUtils.Chance(30, 1, 0);
+                        }
+
                         break;
                     case 5:
                         if (!cumCondition.HasFlag(CharacterCumCondition.Dominating) && !cumCondition.HasFlag(CharacterCumCondition.FullDominating))
+                        {
                             damage = RandomUtils.Chance(30, 1, 0);
+                        }
+
                         break;
                     default:
                         break;
                 }
             }
-        } catch (Exception ex) {
-            Plugin.Log.Error(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static bool IsCharacterCorrupted() {
-        try {
+    internal static bool IsCharacterCorrupted()
+    {
+        try
+        {
             if (!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
+            {
                 return false;
+            }
 
-            if (!SexSystem.PlayerAttacker) {
-                return RandomUtils.Chance(((Character.statusDATA.TrainedLevel * 0.4f) + (Character.statusDATA.CorruptionLevel * 0.6f)) / 10f);
-            } else {
+            if (!SexSystem.PlayerAttacker)
+            {
+                return RandomUtils.Chance((Character.statusDATA.TrainedLevel * 0.4f + Character.statusDATA.CorruptionLevel * 0.6f) / 10f);
+            }
+            else
+            {
                 int chance = SexSystem.Enemy.GetComponentWithCast<EnemyCharacterComponent>()?.CorruptionChance ?? 0;
                 return RandomUtils.Chance(chance);
             }
-        } catch (Exception ex) {
-            Plugin.Log.Error(ex);
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex);
             return false;
         }
     }
 
-    private static SexMoveExtended GetSexMove() {
+    private static SexMoveExtended GetSexMove()
+    {
         EnemyCharacterComponent enemyCharacter = SexSystem.Enemy.GetComponentWithCast<EnemyCharacterComponent>();
         EnemySexModel enemySexTypes = enemyCharacter?.EnemySexTypes;
         CharacterGender caster = SexSystem.CasterMale ? CharacterGender.Male : CharacterGender.Female;
         CharacterGender target = SexSystem.TargetMale ? CharacterGender.Male : CharacterGender.Female;
         bool isCollared = IsCharacterCorrupted();
-        SexPositionType positionType = enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.SexTypes.Any() 
-            ? SexPositionType.All 
+        SexPositionType positionType = enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.SexTypes.Count != 0
+            ? SexPositionType.All
             : GetSexPositionType();
         List<SexMoveExtended> sexMoves = [];
-        foreach (var sexMove in SexMoves) {
+        foreach (SexMoveExtended sexMove in SexMoves)
+        {
             if (sexMove.IsDisabled)
+            {
                 continue;
+            }
 
             // Enemy trait sex type should be used always if they setted
-            if (enemyCharacter is not null && enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.SexTypes.Any() && !enemyCharacter.EnemyTrait.SexTypes.Contains(sexMove.Type)) { 
-                continue; 
-            } else {
-                switch (positionType) {
+            if (enemyCharacter is not null && enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.SexTypes.Count != 0 && !enemyCharacter.EnemyTrait.SexTypes.Contains(sexMove.Type))
+            {
+                continue;
+            }
+            else
+            {
+                switch (positionType)
+                {
                     case SexPositionType.Foreplay:
                         if (sexMove.Type is >= 5)
+                        {
                             continue;
+                        }
+
                         break;
                     case SexPositionType.Other:
                         if (sexMove.Type != 5)
+                        {
                             continue;
+                        }
+
                         break;
                     case SexPositionType.Sex:
                         if (sexMove.Type is < 6)
+                        {
                             continue;
+                        }
+
                         break;
                     default:
                         break;
@@ -288,63 +411,97 @@ internal class SexMoveChoiceMod {
             }
 
             if (sexMove.IsCommand && !isCollared)
+            {
                 continue;
+            }
 
-            if (SexSystem.PlayerAttacker) {
+            if (SexSystem.PlayerAttacker)
+            {
                 if (UsePlayerPreferredPositions.Value && !Character.statusDATA.PreferredSex.Contains(sexMove.ID))
+                {
                     continue;
-            } else {
-                if (enemySexTypes is not null) {
+                }
+            }
+            else
+            {
+                if (enemySexTypes is not null)
+                {
                     if (!enemySexTypes.UseTag && !enemySexTypes.CheckSexMove(sexMove.ID))
+                    {
                         continue;
+                    }
                     else if (enemySexTypes.UseTag && !enemySexTypes.CheckSexTag(sexMove))
+                    {
                         continue;
+                    }
                 }
             }
 
             if (sexMove.CasterGender is not CharacterGender.Any && sexMove.CasterGender != caster)
+            {
                 continue;
-            
-            if (sexMove.CasterRole is not CharacterRole.Any) {
+            }
+
+            if (sexMove.CasterRole is not CharacterRole.Any)
+            {
                 if (SexSystem.CasterActive && sexMove.CasterRole is not CharacterRole.Active)
+                {
                     continue;
+                }
                 else if (!SexSystem.CasterActive && sexMove.CasterRole is not CharacterRole.Passive)
+                {
                     continue;
+                }
             }
 
             if (sexMove.TargetGender is not CharacterGender.Any && sexMove.TargetGender != target)
+            {
                 continue;
+            }
 
-            if (sexMove.TargetRole is not CharacterRole.Any) {
+            if (sexMove.TargetRole is not CharacterRole.Any)
+            {
                 if (SexSystem.TargetActive && sexMove.TargetRole is not CharacterRole.Active)
+                {
                     continue;
+                }
                 else if (!SexSystem.TargetActive && sexMove.TargetRole is not CharacterRole.Passive)
+                {
                     continue;
+                }
             }
 
             sexMoves.Add(sexMove);
         }
 
         if (sexMoves.Count == 0)
+        {
             return null;
+        }
 
         sexMoves.Shuffle();
-        var move = sexMoves.RandomItem();
+        SexMoveExtended move = sexMoves.RandomItem();
         LastSexMove = move;
         return move;
     }
 
-    private static SexPositionType GetSexPositionType() {
-        if (UsePoseSelectionSystem.Value) {
+    private static SexPositionType GetSexPositionType()
+    {
+        if (UsePoseSelectionSystem.Value)
+        {
             float sexChance = 1f - Mathf.Exp(-InteractionCounts / 2f); // /2 управляет “скоростью” роста
             float foreplayChance = 1f - sexChance;
 
             float rnd = RandomUtils.Float(0f, 1f);
 
             if (rnd < foreplayChance * 0.8f)
+            {
                 return SexPositionType.Foreplay;
+            }
             else if (rnd < foreplayChance)
+            {
                 return SexPositionType.Other;
+            }
 
             return SexPositionType.Sex;
         }
@@ -352,7 +509,8 @@ internal class SexMoveChoiceMod {
         return SexPositionType.All;
     }
 
-    private static List<SexMoveExtended> GetExtendedSexMoves() {
+    private static List<SexMoveExtended> GetExtendedSexMoves()
+    {
         List<SexMoveExtended> sexMoves = [
             #region Oral
             new () {
@@ -4520,7 +4678,8 @@ internal class SexMoveChoiceMod {
     }
 }
 
-internal enum SexPositionType {
+internal enum SexPositionType
+{
     All,
     Foreplay,
     Other,

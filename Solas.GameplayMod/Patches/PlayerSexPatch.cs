@@ -1,27 +1,33 @@
-﻿using System;
-
 using HarmonyLib;
-
+using Il2Cpp;
 using Solas.GameplayMod.Mods;
 
 namespace Solas.GameplayMod.Patches;
-internal class PlayerSexPatch {
-    internal static bool Prepare() {
-        try {
-            if(!SexDamageMod.IsModActive && !SexInitiatorStateMod.IsModActive && !SexMoveChoiceMod.IsModActive)
+internal class PlayerSexPatch
+{
+    internal static bool Prepare()
+    {
+        try
+        {
+            if (!SexDamageMod.IsModActive && !SexInitiatorStateMod.IsModActive && !SexMoveChoiceMod.IsModActive)
+            {
                 return false;
+            }
 
             return true;
-        } catch(Exception) {
-            Plugin.Log.LogWarning( $"{nameof( PlayerSexPatch )} not applied due exeption" );
+        }
+        catch (Exception)
+        {
+            GameplayMod.Log.Warning($"{nameof(PlayerSexPatch)} not applied due exeption");
             return false;
         }
     }
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch( typeof( PlayerSex ), nameof( PlayerSex.CumFX ) )]
-    static void PlayerSexCumFXPostfix() {
+    [HarmonyPatch(typeof(PlayerSex), nameof(PlayerSex.CumFX))]
+    static void PlayerSexCumFXPostfix()
+    {
         SexDamageMod.PlayerCum();
         SexInitiatorStateMod.Apply();
     }
@@ -29,7 +35,5 @@ internal class PlayerSexPatch {
     [HarmonyPostfix]
     [HarmonyWrapSafe]
     [HarmonyPatch(typeof(PlayerSex), nameof(PlayerSex.Escape))]
-    static void PlayerSexEscapePostfix() {
-        SexMoveChoiceMod.InteractionCounts = 0;
-    }
+    static void PlayerSexEscapePostfix() => SexMoveChoiceMod.InteractionCounts = 0;
 }

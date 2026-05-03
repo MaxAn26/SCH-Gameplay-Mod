@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
 namespace Solas.GameplayMod.Models;
-internal class SexMoveExtended : IComparable<SexMoveExtended> {
+internal class SexMoveExtended : IComparable<SexMoveExtended>
+{
     public bool IsDisabled { get; set; }
     public int Type { get; set; }
     public int ID { get; set; }
@@ -30,12 +31,17 @@ internal class SexMoveExtended : IComparable<SexMoveExtended> {
 
     public int CompareTo(SexMoveExtended other) => other is null ? 1 : ID.CompareTo(other.ID);
 
-    public override bool Equals(object obj) {
+    public override bool Equals(object obj)
+    {
         if (obj is null)
+        {
             return false;
+        }
 
         if (obj is not SexMoveExtended sexMove2)
+        {
             return false;
+        }
 
         return ID == sexMove2.ID;
     }
@@ -43,29 +49,32 @@ internal class SexMoveExtended : IComparable<SexMoveExtended> {
     public override int GetHashCode() => ID.GetHashCode();
 }
 
-internal enum CharacterGender {
+internal enum CharacterGender
+{
     Any,
     Female,
     Male
 }
 
-internal enum CharacterRole {
+internal enum CharacterRole
+{
     Any,
     Active,
     Passive
 }
 
 [Flags]
-internal enum CharacterCumCondition {
-    None            = 0,
-    FullDominated   = 1 << 0,
-    PreDominated    = 1 << 1,
-    Idle            = 1 << 2,
-    PreDominating   = 1 << 3,
-    FullDominating  = 1 << 4,
-    SexToy          = 1 << 5,
+internal enum CharacterCumCondition
+{
+    None = 0,
+    FullDominated = 1 << 0,
+    PreDominated = 1 << 1,
+    Idle = 1 << 2,
+    PreDominating = 1 << 3,
+    FullDominating = 1 << 4,
+    SexToy = 1 << 5,
 
-    Dominated       = PreDominated | FullDominated,
-    Dominating      = PreDominating | FullDominating,
-    Always          = Dominated | Idle | Dominating,
+    Dominated = PreDominated | FullDominated,
+    Dominating = PreDominating | FullDominating,
+    Always = Dominated | Idle | Dominating,
 }

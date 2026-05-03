@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Solas.DirtyTalkMod.Models;
-public class PlayerDirtyTalkModel {
+public class PlayerDirtyTalkModel
+{
     #region Bondage
     public PhraseModel BoundGeneral { get; set; } = new() { Base = ["Stop it!", "Hey no, not restraints!", "Oh no, more restraints!", "These restraints won't stop me...", "Why this keeps happening to me?"] };
     public PhraseModel BoundCollar { get; set; } = new();
@@ -111,7 +112,8 @@ public class PlayerDirtyTalkModel {
     #endregion
 }
 
-public class PlayerDirtyTalkEnemyTypeModel : PlayerDirtyTalkModel {
+public class PlayerDirtyTalkEnemyTypeModel : PlayerDirtyTalkModel
+{
     public CharacterGender PlayerGender { get; set; } = CharacterGender.None;
     public CharacterGender EnemyGender { get; set; } = CharacterGender.None;
     public List<int> EnemyTypes { get; set; } = [];

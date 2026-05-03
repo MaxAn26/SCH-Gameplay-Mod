@@ -1,20 +1,19 @@
-﻿using System;
-
-using BaseMod.Core.Extensions;
+using BaseMod.Core;
 using BaseMod.Core.Utils;
-
-using BepInEx.Configuration;
-
+using Il2Cpp;
+using MelonLoader;
 using UnityEngine.SceneManagement;
+using static BaseMod.Core.ModConfig;
 
 namespace Solas.GameplayMod.Mods;
-internal class RandomReverseMod {
+internal class RandomReverseMod
+{
     #region Configuration
-    internal static ConfigEntry<bool> Enabled;
-    internal static ConfigEntry<bool> IgnoreAtSameRoles;
-    internal static ConfigEntry<bool> WhenPlayerWeak;
-    internal static ConfigEntry<bool> WhenPlayerCollared;
-    internal static ConfigEntry<int> Chance;
+    internal static MelonPreferences_Entry<bool> Enabled;
+    internal static MelonPreferences_Entry<bool> IgnoreAtSameRoles;
+    internal static MelonPreferences_Entry<bool> WhenPlayerWeak;
+    internal static MelonPreferences_Entry<bool> WhenPlayerCollared;
+    internal static MelonPreferences_Entry<int> Chance;
     #endregion
 
     #region States
@@ -26,51 +25,72 @@ internal class RandomReverseMod {
     internal static CharacterData Character => CharacterData.Instance;
     #endregion
 
-    internal static void Load( ConfigFile config ) {
-        try {
-            Enabled = config.Bind( nameof( RandomReverseMod ), nameof( Enabled ), false,
-                new ConfigDescription( "Activates the modification", new AcceptableValueList<bool>( [true, false] ) ) );
-            IgnoreAtSameRoles = config.Bind( nameof( RandomReverseMod ), nameof( IgnoreAtSameRoles ), true,
-                new ConfigDescription( "Do not activate when the enemy's role matches the player's role", new AcceptableValueList<bool>( [true, false] ) ) );
-            WhenPlayerWeak = config.Bind( nameof( RandomReverseMod ), nameof( WhenPlayerWeak ), true,
-                new ConfigDescription( "Activate only if the player is weak to the current sexual position", new AcceptableValueList<bool>( [true, false] ) ) );
-            WhenPlayerCollared = config.Bind( nameof( RandomReverseMod ), nameof( WhenPlayerCollared ), true,
-                new ConfigDescription( "Activate only if the player wears a collar", new AcceptableValueList<bool>( [true, false] ) ) );
-            Chance = config.Bind( nameof( RandomReverseMod ), nameof( Chance ), 20,
-                new ConfigDescription( "Chance for animation reversal", new AcceptableValueRange<int>( 0, 100 ) ) );
+    internal static void Load(ModConfig config)
+    {
+        try
+        {
+            Enabled = config.Entry(nameof(RandomReverseMod), nameof(Enabled), false,
+                "Activates the modification", new AcceptableValueList<bool>([true, false]));
+            IgnoreAtSameRoles = config.Entry(nameof(RandomReverseMod), nameof(IgnoreAtSameRoles), true,
+                "Do not activate when the enemy's role matches the player's role", new AcceptableValueList<bool>([true, false]));
+            WhenPlayerWeak = config.Entry(nameof(RandomReverseMod), nameof(WhenPlayerWeak), true,
+                "Activate only if the player is weak to the current sexual position", new AcceptableValueList<bool>([true, false]));
+            WhenPlayerCollared = config.Entry(nameof(RandomReverseMod), nameof(WhenPlayerCollared), true,
+                "Activate only if the player wears a collar", new AcceptableValueList<bool>([true, false]));
+            Chance = config.Entry(nameof(RandomReverseMod), nameof(Chance), 20,
+                "Chance for animation reversal", new AcceptableValueRange<int>(0, 100));
 
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex.Message );
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static void Apply( SexSystem sexSystem ) {
-        try {
-            if(!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
+    internal static void Apply(SexSystem sexSystem)
+    {
+        try
+        {
+            if (!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
+            {
                 return;
+            }
 
-            if(Character.statusDATA.IsBoundHeavyRestraint > 0 || SexSystem.GameOver)
+            if (Character.statusDATA.IsBoundHeavyRestraint > 0 || SexSystem.GameOver)
+            {
                 return;
+            }
 
-            if(IgnoreAtSameRoles.Value && sexSystem.CasterActive == sexSystem.TargetActive)
+            if (IgnoreAtSameRoles.Value && sexSystem.CasterActive == sexSystem.TargetActive)
+            {
                 return;
+            }
 
-            if(WhenPlayerWeak.Value && !sexSystem.playerweak)
+            if (WhenPlayerWeak.Value && !sexSystem.playerweak)
+            {
                 return;
+            }
 
-            if(WhenPlayerCollared.Value && Character.statusDATA.IsBoundCollar == 0)
+            if (WhenPlayerCollared.Value && Character.statusDATA.IsBoundCollar == 0)
+            {
                 return;
+            }
 
-            if(RandomUtils.Chance( Chance.Value )) {
+            if (RandomUtils.Chance(Chance.Value))
+            {
                 SexSystem.ReverseMode = !SexSystem.ReverseMode;
                 IsActivated = true;
-            } else {
+            }
+            else
+            {
                 IsActivated = false;
-            }    
+            }
 
             return;
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex.Message );
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
             return;
         }
     }

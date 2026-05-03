@@ -1,5 +1,6 @@
-﻿namespace Solas.GameplayMod.Models;
-public class LustCageConfig {
+namespace Solas.GameplayMod.Models;
+public class LustCageConfig
+{
     public bool OralReceiver { get; set; } = false;
     public bool LickPussy { get; set; } = false;
     public bool SuckDick { get; set; } = false;

@@ -1,19 +1,18 @@
-﻿using System;
 using System.Collections;
-
+using BaseMod.Core;
 using BaseMod.Core.Extensions;
 using BaseMod.Core.Utils;
-
-using BepInEx.Configuration;
-using BepInEx.Unity.IL2CPP.Utils.Collections;
-
+using Il2Cpp;
+using MelonLoader;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static BaseMod.Core.ModConfig;
 
 namespace Solas.GameplayMod.Mods;
-internal class FuckMeMod {
+internal class FuckMeMod
+{
     #region Configuration
-    internal static ConfigEntry<bool> Enabled;
+    internal static MelonPreferences_Entry<bool> Enabled;
     #endregion
 
     #region States
@@ -26,48 +25,72 @@ internal class FuckMeMod {
     internal static Rigidbody PlayerRigitbody;
     #endregion
 
-    internal static void Load( ConfigFile config ) {
-        try {
-            Enabled = config.Bind( nameof( FuckMeMod ), nameof( Enabled ), false,
-                new ConfigDescription( "Activates the modification", new AcceptableValueList<bool>( [true, false] ) ) );
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex.Message );
+    internal static void Load(ModConfig config)
+    {
+        try
+        {
+            Enabled = config.Entry(nameof(FuckMeMod), nameof(Enabled), false,
+                "Activates the modification", new AcceptableValueList<bool>([true, false]));
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static void Apply( SexSystem sexSystem ) {
-        try {
-            if(!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
+    internal static void Apply(SexSystem sexSystem)
+    {
+        try
+        {
+            if (!Enabled.Value || SceneManager.GetActiveScene().buildIndex <= 4)
+            {
                 return;
-
-            SexSystem = sexSystem;
-            if(SexSystem.Player.TryGetComponentWithCast( out Rigidbody rigitbody )) {
-                PlayerRigitbody = rigitbody;
-                _ = SexSystem.StartCoroutine( FuckMeEnumerator().WrapToIl2Cpp() );
             }
 
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex.Message );
+            SexSystem = sexSystem;
+            if (SexSystem.Player.TryGetComponentWithCast(out Rigidbody rigitbody))
+            {
+                PlayerRigitbody = rigitbody;
+                MelonCoroutines.Start(FuckMeEnumerator());
+            }
+
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    private static IEnumerator FuckMeEnumerator() {
-        do {
-            if (SexSystem is null || PlayerRigitbody is null || SexSystem.GameOver || SceneManager.GetActiveScene().buildIndex < 4)                 
+    private static IEnumerator FuckMeEnumerator()
+    {
+        do
+        {
+            if (SexSystem is null || PlayerRigitbody is null || SexSystem.GameOver || SceneManager.GetActiveScene().buildIndex < 4)
+            {
                 yield break;
+            }
 
-            if (SexSystem.Sexstatus is SEXSTATUS.Fucking)                 
+            if (SexSystem.Sexstatus is SEXSTATUS.Fucking)
+            {
                 NotAvailable = true;
-            else if (SexSystem.Sexstatus is SEXSTATUS.Idle && SexSystem.playerHealthSystem.CurrentAr == SexSystem.playerHealthSystem.MaxAr) {
-                if(!NotAvailable)                    
+            }
+            else if (SexSystem.Sexstatus is SEXSTATUS.Idle && SexSystem.playerHealthSystem.CurrentAr == SexSystem.playerHealthSystem.MaxAr)
+            {
+                if (!NotAvailable)
+                {
                     NotAvailable = false;
-                else {
+                }
+                else
+                {
                     int chance = 5;
                     chance += SexSystem.playerHealthSystem.CurrentEc / 10;
                     if (chance > 40)
+                    {
                         chance = 40;
+                    }
 
-                    if (RandomUtils.Chance(chance)) {
+                    if (RandomUtils.Chance(chance))
+                    {
                         SexSystem.console.ConsoleWrite("Fuck me");
                         SexSystem.CanMove = false;
                         PlayerRigitbody.velocity = Vector3.zero;
@@ -78,7 +101,7 @@ internal class FuckMeMod {
                     }
                 }
             }
-            yield return new WaitForSeconds( 10f );
-        } while(true);
+            yield return new WaitForSeconds(10f);
+        } while (true);
     }
 }

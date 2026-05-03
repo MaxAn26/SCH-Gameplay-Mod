@@ -1,19 +1,17 @@
-﻿using System;
-
-using BaseMod.Core.Extensions;
+using BaseMod.Core;
 using BaseMod.Core.Utils;
-
-using BepInEx.Configuration;
-
+using Il2Cpp;
+using MelonLoader;
 using UnityEngine.SceneManagement;
 
 namespace Solas.GameplayMod.Mods;
-internal class CapturedSlaveMod {
+internal class CapturedSlaveMod
+{
     #region Configuration
-    internal static ConfigEntry<bool> Enabled;
-    internal static ConfigEntry<int> InteractionCount;
-    internal static ConfigEntry<bool> RandomCount;
-    internal static ConfigEntry<int> MaxInteractions;
+    internal static MelonPreferences_Entry<bool> Enabled;
+    internal static MelonPreferences_Entry<int> InteractionCount;
+    internal static MelonPreferences_Entry<bool> RandomCount;
+    internal static MelonPreferences_Entry<int> MaxInteractions;
     #endregion
 
     #region States
@@ -32,32 +30,41 @@ internal class CapturedSlaveMod {
     internal static PlayerHealthSystem PlayerHealthSystem;
     #endregion
 
-    internal static void Load( ConfigFile config ) {
-        try {
-            Enabled = config.Bind( nameof( CapturedSlaveMod ), nameof( Enabled ), false,
-                new ConfigDescription( "Activates the modification", new AcceptableValueList<bool>( [true, false] ) ) );
-            InteractionCount = config.Bind( nameof( CapturedSlaveMod ), nameof( InteractionCount ), 4,
-                new ConfigDescription( "Count of sex interactions required for escape", new AcceptableValueRange<int>( 1, 50 ) ) );
-            RandomCount = config.Bind( nameof( CapturedSlaveMod ), nameof( RandomCount ), true,
-                new ConfigDescription( "Use a random count of sex interactions for escape", new AcceptableValueList<bool>( [true, false] ) ) );
-            MaxInteractions = config.Bind( nameof( CapturedSlaveMod ), nameof( MaxInteractions ), 5,
-                new ConfigDescription( "Maximum count of sex interactions for escape when using RandomCount", new AcceptableValueRange<int>( 1, 50 ) ) );
+    internal static void Load(ModConfig config)
+    {
+        try
+        {
+            Enabled = config.Entry(nameof(CapturedSlaveMod), nameof(Enabled), false,
+                "Activates the modification", new ModConfig.AcceptableValueList<bool>([true, false]));
+            InteractionCount = config.Entry(nameof(CapturedSlaveMod), nameof(InteractionCount), 4,
+                "Count of sex interactions required for escape", new ModConfig.AcceptableValueRange<int>(1, 50));
+            RandomCount = config.Entry(nameof(CapturedSlaveMod), nameof(RandomCount), true,
+                "Use a random count of sex interactions for escape", new ModConfig.AcceptableValueList<bool>([true, false]));
+            MaxInteractions = config.Entry(nameof(CapturedSlaveMod), nameof(MaxInteractions), 5,
+                "Maximum count of sex interactions for escape when using RandomCount", new ModConfig.AcceptableValueRange<int>(1, 50));
 
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex.Message );
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static void Apply( CaptureSystem captureSystem ) {
-        try {
-            if(!Enabled.Value || !CharacterData.adultSettingsDATA.NSFWMode || SceneManager.GetActiveScene().buildIndex <= 4)
+    internal static void Apply(CaptureSystem captureSystem)
+    {
+        try
+        {
+            if (!Enabled.Value || !CharacterData.adultSettingsDATA.NSFWMode || SceneManager.GetActiveScene().buildIndex <= 4)
+            {
                 return;
+            }
 
-            if(!IsActivated) {
+            if (!IsActivated)
+            {
                 CaptureSystem = captureSystem;
                 PlayerHealthSystem = CaptureSystem.sexsystem.playerHealthSystem;
 
-                var interactions = RandomCount.Value ? RandomUtils.Int32(1, MaxInteractions.Value) : InteractionCount.Value;
+                int interactions = RandomCount.Value ? RandomUtils.Int32(1, MaxInteractions.Value) : InteractionCount.Value;
 
                 Step = PlayerHealthSystem.MaxSP / interactions;
                 Limit = Step;
@@ -67,42 +74,61 @@ internal class CapturedSlaveMod {
             }
 
             return;
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex );
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex);
             return;
         }
     }
 
-    internal static void NextEnemy() {
-        try {
-            if(!IsActivated)
+    internal static void NextEnemy()
+    {
+        try
+        {
+            if (!IsActivated)
+            {
                 return;
+            }
 
             Limit += Step;
-            if(Limit > PlayerHealthSystem.MaxSP)
+            if (Limit > PlayerHealthSystem.MaxSP)
+            {
                 Limit = PlayerHealthSystem.MaxSP;
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex );
+            }
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex);
             return;
         }
     }
 
-    internal static void UpdateSpecial( ref int special ) {
-        try {
-            if(!IsActivated)
+    internal static void UpdateSpecial(ref int special)
+    {
+        try
+        {
+            if (!IsActivated)
+            {
                 return;
+            }
 
-            if(special < Limit)
+            if (special < Limit)
+            {
                 return;
+            }
 
             PlayerHealthSystem.CurrentSP = Limit;
             special = PlayerHealthSystem.CurrentSP;
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex );
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex);
         }
     }
 
-    internal static void Reset() {
+    internal static void Reset()
+    {
         CaptureSystem = null;
         PlayerHealthSystem = null;
         IsActivated = false;

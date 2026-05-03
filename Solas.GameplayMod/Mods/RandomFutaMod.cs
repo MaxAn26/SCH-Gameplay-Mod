@@ -1,73 +1,89 @@
-﻿using System;
 using System.Collections;
-
+using BaseMod.Core;
 using BaseMod.Core.Extensions;
 using BaseMod.Core.Utils;
-
-using BepInEx.Configuration;
-using BepInEx.Unity.IL2CPP.Utils.Collections;
-
+using Il2Cpp;
+using MelonLoader;
 using UnityEngine;
+using static BaseMod.Core.ModConfig;
 
 namespace Solas.GameplayMod.Mods;
-internal class RandomFutaMod {
+internal class RandomFutaMod
+{
     #region Configuration
-    internal static ConfigEntry<bool> Enabled;
-    internal static ConfigEntry<int> ChanceForFuta;
-    internal static ConfigEntry<int> ChanceForFullFuta;
+    internal static MelonPreferences_Entry<bool> Enabled;
+    internal static MelonPreferences_Entry<int> ChanceForFuta;
+    internal static MelonPreferences_Entry<int> ChanceForFullFuta;
     #endregion
 
     #region States
     internal static bool IsModActive => Enabled.Value;
     #endregion
 
-    internal static void Load( ConfigFile config ) {
-        try {
-            Enabled = config.Bind( nameof( RandomFutaMod ), nameof( Enabled ), false,
-                new ConfigDescription( "Activates the modification", new AcceptableValueList<bool>( [true, false] ) ) );
-            ChanceForFuta = config.Bind(nameof(RandomFutaMod), nameof(ChanceForFuta), 35,
-                new ConfigDescription("Chance for female character with active or mixed role become futanari", new AcceptableValueRange<int>(0, 100)));
-            ChanceForFullFuta = config.Bind(nameof(RandomFutaMod), nameof(ChanceForFullFuta), 50,
-                new ConfigDescription("Chance for female futa character get full futa (dick + balls)", new AcceptableValueRange<int>(0, 100)));
+    internal static void Load(ModConfig config)
+    {
+        try
+        {
+            Enabled = config.Entry(nameof(RandomFutaMod), nameof(Enabled), false,
+                "Activates the modification", new AcceptableValueList<bool>([true, false]));
+            ChanceForFuta = config.Entry(nameof(RandomFutaMod), nameof(ChanceForFuta), 35,
+                "Chance for female character with active or mixed role become futanari", new AcceptableValueRange<int>(0, 100));
+            ChanceForFullFuta = config.Entry(nameof(RandomFutaMod), nameof(ChanceForFullFuta), 50,
+                "Chance for female futa character get full futa (dick + balls)", new AcceptableValueRange<int>(0, 100));
 
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex.Message );
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
         }
     }
 
-    internal static void Apply( EnemySex enemySex ) {
-        try {
-            if(!Enabled.Value)
+    internal static void Apply(EnemySex enemySex)
+    {
+        try
+        {
+            if (!Enabled.Value)
+            {
                 return;
+            }
 
-            if(enemySex.EnemyMale)
+            if (enemySex.EnemyMale)
+            {
                 return;
+            }
 
-            _ = enemySex.StartCoroutine( UpdateDick( enemySex ).WrapToIl2Cpp() );
-        } catch(Exception ex) {
-            Plugin.Log.Error( ex.Message );
+            MelonCoroutines.Start(UpdateDick(enemySex));
+        }
+        catch (Exception ex)
+        {
+            GameplayMod.Log.Error(ex.Message);
             return;
         }
     }
 
-    internal static IEnumerator UpdateDick( EnemySex enemySex ) {
-        yield return new WaitForSeconds( 2f );
+    internal static IEnumerator UpdateDick(EnemySex enemySex)
+    {
+        yield return new WaitForSeconds(2f);
 
-        if (RandomUtils.Chance(ChanceForFuta.Value)) {
-            Plugin.Log.Info($"{enemySex.gameObject.GetComponentWithCast<EnemyAI>()?.enemyName} will use a dick");
+        if (RandomUtils.Chance(ChanceForFuta.Value))
+        {
+            GameplayMod.Log.Msg($"{enemySex.gameObject.GetComponentWithCast<EnemyAI>()?.enemyName} will use a dick");
 
             enemySex.Dick.sharedMesh = RandomUtils.Chance(ChanceForFullFuta.Value) ? enemySex.DickMesh : enemySex.DickHalfMesh;
             Material material = UnityEngine.Object.Instantiate(enemySex.DickMatF);
             enemySex.Dick.material = material;
-            var color = enemySex.Character.material.GetColor("_Albedo_Tint");
+            Color color = enemySex.Character.material.GetColor("_Albedo_Tint");
             material.SetColor("_Albedo_Tint", color);
-        } else {
-            Plugin.Log.Info($"{enemySex.gameObject.GetComponentWithCast<EnemyAI>()?.enemyName} will use strapon");
+        }
+        else
+        {
+            GameplayMod.Log.Msg($"{enemySex.gameObject.GetComponentWithCast<EnemyAI>()?.enemyName} will use strapon");
 
             enemySex.Dick.sharedMesh = enemySex.StrapMesh;
             Material material = UnityEngine.Object.Instantiate(enemySex.StrapMat);
             enemySex.Dick.material = material;
-            Color color = new() {
+            Color color = new()
+            {
                 r = RandomUtils.Float(0.0f, 1.0f),
                 g = RandomUtils.Float(0.0f, 1.0f),
                 b = RandomUtils.Float(0.0f, 1.0f),

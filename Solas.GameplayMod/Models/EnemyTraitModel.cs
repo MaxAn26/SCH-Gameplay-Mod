@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using BaseMod.Core.Utils;
 
 using UnityEngine;
 
 namespace Solas.GameplayMod.Models;
-internal class EnemyTraitModel {
+internal class EnemyTraitModel
+{
     public int? EnemyType { get; set; }
     public string Name { get; set; }
     public TraitType TraitType { get; set; } = TraitType.General;
@@ -26,14 +27,20 @@ internal class EnemyTraitModel {
     public TraitOperation LustfulOperation { get; set; } = TraitOperation.None;
     public int LustfulValue { get; set; }
 
-    public int CalculateValue(TraitOperation operation, int originValue, int operationValue) {
+    public int CalculateValue(TraitOperation operation, int originValue, int operationValue)
+    {
         int maxValue = 7;
         if (TraitType is TraitType.Enhanced)
+        {
             maxValue = 10;
+        }
         else if (TraitType is TraitType.MiniBoss)
+        {
             maxValue = 14;
+        }
 
-        switch (operation) {
+        switch (operation)
+        {
             case TraitOperation.Increase:
                 return Mathf.Clamp(originValue + operationValue, 0, maxValue);
             case TraitOperation.Decrease:
@@ -50,22 +57,25 @@ internal class EnemyTraitModel {
     }
 }
 
-public enum TraitType {
+public enum TraitType
+{
     General,
     Enhanced,
     MiniBoss
 }
 
-public enum CharacterInvulnerable {
+public enum CharacterInvulnerable
+{
     None,
     SexHealth,
     Pleasure
 }
 
-public enum TraitOperation {
+public enum TraitOperation
+{
     None,
     Increase,
-    Decrease,   
-    Replace,    
+    Decrease,
+    Replace,
     Random      // 0 - 7/10/14
 }

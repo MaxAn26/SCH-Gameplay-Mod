@@ -1,29 +1,34 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Solas.DirtyTalkMod.Models;
-public class PhraseModel {
+public class PhraseModel
+{
     public List<string> Base { get; set; } = [];
     public List<string> Female { get; set; } = [];
     public List<string> Futa { get; set; } = [];
     public List<string> Male { get; set; } = [];
 
-    public PhraseModel() {
+    public PhraseModel()
+    {
         Base = [];
         Female = [];
         Futa = [];
         Male = [];
     }
 
-    public PhraseModel(string initValue) {
+    public PhraseModel(string initValue)
+    {
         Base = [initValue];
         Female = [initValue];
         Futa = [initValue];
         Male = [initValue];
     }
 
-    internal List<string> GetPhrases(CharacterGender gender) {
+    internal List<string> GetPhrases(CharacterGender gender)
+    {
         List<string> result = [];
-        switch (gender) {
+        switch (gender)
+        {
             case CharacterGender.Female:
                 result.AddRange(Female);
                 break;
@@ -38,7 +43,9 @@ public class PhraseModel {
         }
 
         if (result.Count == 0)
+        {
             result.AddRange(Base);
+        }
 
         return result;
     }

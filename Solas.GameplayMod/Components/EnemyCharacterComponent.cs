@@ -1,21 +1,20 @@
-﻿using System;
 using System.Collections;
 
 using BaseMod.Core.Extensions;
+using BaseMod.Core.Interfaces;
 using BaseMod.Core.Utils;
-
-using BepInEx.Unity.IL2CPP.Utils.Collections;
-
+using Il2Cpp;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
-
+using MelonLoader;
 using Solas.GameplayMod.Models;
 using Solas.GameplayMod.Mods;
 
 using UnityEngine;
 
 namespace Solas.GameplayMod.Components;
-internal class EnemyCharacterComponent : MonoBehaviour {
+internal class EnemyCharacterComponent : MonoBehaviour, IInitializeComponent
+{
     internal MaterialPropertyBlock MaterialPropertyBlock = new();
     internal SexSystem SexSystem;
     internal EnemyAI EnemyAI;
@@ -31,44 +30,51 @@ internal class EnemyCharacterComponent : MonoBehaviour {
     private int _glossTick = 0;
 
     #region Il2Cpp .ctor
-    static EnemyCharacterComponent() {
-        ClassInjector.RegisterTypeInIl2Cpp<EnemyCharacterComponent>();
-    }
+    static EnemyCharacterComponent() => ClassInjector.RegisterTypeInIl2Cpp<EnemyCharacterComponent>();
 
-    public EnemyCharacterComponent() : base(ClassInjector.DerivedConstructorPointer<EnemyCharacterComponent>()) {
-        ClassInjector.DerivedConstructorBody(this);
-    }
+    public EnemyCharacterComponent() : base(ClassInjector.DerivedConstructorPointer<EnemyCharacterComponent>()) => ClassInjector.DerivedConstructorBody(this);
 
-    public EnemyCharacterComponent(IntPtr pointer) : base(pointer) {
+    public EnemyCharacterComponent(IntPtr pointer) : base(pointer)
+    {
 
     }
     #endregion
 
-    public void Initialize() {
-        try {
-            if (gameObject.TryGetComponentWithCast(out EnemyAI enemyAI)) {
+    public void Initialize()
+    {
+        try
+        {
+            if (gameObject.TryGetComponentWithCast(out EnemyAI enemyAI))
+            {
                 EnemyAI = enemyAI;
                 SexSystem = enemyAI.Sexscript;
-            } else {
+            }
+            else
+            {
                 Destroy(this);
             }
 
-            if (RandomEnemyRoleMod.IsModActive) {
+            if (RandomEnemyRoleMod.IsModActive)
+            {
                 IsActive = RandomEnemyRoleMod.GetRandomRole(enemyAI.EnSex.EnemyMale);
             }
 
-            if (EnemyTraitsMod.IsModActive) {
-                var trait = EnemyTraitsMod.GetEnemyTrait(EnemyAI.typeOfEnemy);
-                if (trait is not null) {
+            if (EnemyTraitsMod.IsModActive)
+            {
+                EnemyTraitModel trait = EnemyTraitsMod.GetEnemyTrait(EnemyAI.typeOfEnemy);
+                if (trait is not null)
+                {
                     EnemyTraitsMod.ApplyTrait(enemyAI, trait);
                     EnemyTrait = trait;
-                    Plugin.Log.Info($"Enemy '{EnemyAI.enemyName}' get {trait.Name} ({trait.TraitType}) trait");
+                    GameplayMod.Log.Msg($"Enemy '{EnemyAI.enemyName}' get {trait.Name} ({trait.TraitType}) trait");
                 }
             }
 
-            if (EnemySexExtendMod.IsModActive) {
-                var sexTypes = EnemySexExtendMod.GetEnemySexModel(EnemyAI.typeOfEnemy);
-                if (sexTypes is not null) {
+            if (EnemySexExtendMod.IsModActive)
+            {
+                EnemySexModel sexTypes = EnemySexExtendMod.GetEnemySexModel(EnemyAI.typeOfEnemy);
+                if (sexTypes is not null)
+                {
                     EnemySexTypes = sexTypes;
                     EnemyFetish = RandomUtils.Flag(EnemySexTypes.AllowedFetishes);
                     AsCasterWeaknesses = RandomUtils.Flag(EnemySexTypes.CasterWeaknesses);
@@ -76,27 +82,32 @@ internal class EnemyCharacterComponent : MonoBehaviour {
                     CorruptionChance = EnemySexExtendMod.CalculateCorruption(EnemySexTypes.CorruptionChance, EnemyFetish);
                 }
             }
-        } catch (Exception e) {
-            Plugin.Log.Error(e);
+        }
+        catch (Exception e)
+        {
+            GameplayMod.Log.Error(e);
             Destroy(this);
         }
     }
-    public void Start() {
-        StartCoroutine(UpdateSmoothness().WrapToIl2Cpp());
-    }
+    public void Start() => MelonCoroutines.Start(UpdateSmoothness());
 
-    internal IEnumerator UpdateSmoothness() {
+    internal IEnumerator UpdateSmoothness()
+    {
         yield return new WaitForSeconds(5f);
 
-        if (!UpdateSmoothnessDeviate() && !EnemyAI.isDead && !SexSystem.GameOver) {
+        if (!UpdateSmoothnessDeviate() && !EnemyAI.isDead && !SexSystem.GameOver)
+        {
             _glossTick++;
-            StartCoroutine(UpdateSmoothness().WrapToIl2Cpp());
+            MelonCoroutines.Start(UpdateSmoothness());
         }
     }
 
-    private bool UpdateSmoothnessDeviate() {
+    private bool UpdateSmoothnessDeviate()
+    {
         if (!GlossEffectMod.IsModActive)
+        {
             return true;
+        }
 
         float gloss = GlossEffectMod.GetGlossEffect(_glossTick);
 
@@ -104,19 +115,17 @@ internal class EnemyCharacterComponent : MonoBehaviour {
         UpdateMaterialPropertyBlock(EnemyAI.EnSex.Character, 1, "_SmoothnessDeviate", gloss);
 
         if (EnemyAI.EnSex.EnemyFuta || EnemyAI.EnSex.EnemyMale)
+        {
             UpdateMaterialPropertyBlock(EnemyAI.EnSex.Dick, 0, "_SmoothnessDeviate", gloss);
+        }
 
         return gloss >= GlossEffectMod.MaxGloss.Value;
     }
 
-    private void UpdateMaterialPropertyBlock(Renderer renderer, int index, string property, float value) {
+    private void UpdateMaterialPropertyBlock(Renderer renderer, int index, string property, float value)
+    {
         renderer.GetPropertyBlock(MaterialPropertyBlock, index);
         MaterialPropertyBlock.SetFloat(property, value);
         renderer.SetPropertyBlock(MaterialPropertyBlock, index);
-    }
-
-    [HideFromIl2Cpp]
-    public static void RegisterClass(EnemyAI enemyAI) {
-        enemyAI.gameObject.AddComponentWithAction<EnemyCharacterComponent>(component => component.Initialize());
     }
 }

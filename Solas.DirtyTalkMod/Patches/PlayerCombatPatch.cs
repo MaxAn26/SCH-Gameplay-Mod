@@ -1,20 +1,26 @@
-﻿using System;
-
+using BaseMod.Core.Extensions;
 using HarmonyLib;
-
+using Il2Cpp;
 using Solas.DirtyTalkMod.Components;
 using Solas.DirtyTalkMod.Mods;
 
 namespace Solas.DirtyTalkMod.Patches;
-internal class PlayerCombatPatch {
-    internal static bool Prepare() {
-        try {
+internal class PlayerCombatPatch
+{
+    internal static bool Prepare()
+    {
+        try
+        {
             if (!PlayerDirtyTalkMod.IsModActive)
+            {
                 return false;
+            }
 
             return true;
-        } catch (Exception) {
-            Plugin.Log.LogWarning($"{nameof(PlayerCombatPatch)} not applied due exeption");
+        }
+        catch (Exception)
+        {
+            DirtyTalkMod.Log.Warning($"{nameof(PlayerCombatPatch)} not applied due exeption");
             return false;
         }
     }
@@ -23,8 +29,10 @@ internal class PlayerCombatPatch {
     [HarmonyWrapSafe]
     [HarmonyPatch(typeof(PlayerCombat), nameof(PlayerCombat.Start))]
     [HarmonyPriority(Priority.High)]
-    static void PlayerCombatStartPostfix(PlayerCombat __instance) {
-        MainDirtyTalkComponent.RegisterClass(__instance);
+    static void PlayerCombatStartPostfix(PlayerCombat __instance)
+    {
+
+        __instance.AddModComponent<MainDirtyTalkComponent>();
         PlayerDirtyTalkMod.ApplyPlayerDirtyTalk(__instance);
     }
 }

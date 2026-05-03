@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Solas.DirtyTalkMod.Models;
-public class EnemyDirtyTalkModel {
+public class EnemyDirtyTalkModel
+{
     #region Bondage
     public PhraseModel BoundGeneral { get; set; } = new() { Base = ["This will fit you perfectly", "Is it too thight?", "Hold still!", "You're going to love this, trust me"] };
     public PhraseModel BoundCollar { get; set; } = new() { Base = ["This collar will fit you perfectly...", "A collar worthy of a submissive like you!", "Look at this collared slut!"] };
@@ -114,7 +115,8 @@ public class EnemyDirtyTalkModel {
     #endregion
 }
 
-public class EnemyTypeDirtyTalkModel : EnemyDirtyTalkModel {
+public class EnemyTypeDirtyTalkModel : EnemyDirtyTalkModel
+{
     public CharacterGender Gender { get; set; } = CharacterGender.None;
     public List<int> EnemyTypes { get; set; } = [];
 }
