@@ -4,7 +4,6 @@ using BaseMod.Core.Extensions;
 using BaseMod.Core.Interfaces;
 using BaseMod.Core.Utils;
 using Il2Cpp;
-using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using Solas.DirtyTalkMod.Mods;
@@ -17,6 +16,8 @@ public class MainDirtyTalkComponent : MonoBehaviour, IInitializeComponent
     private bool _cumThoughtRunning = false;
     private SexSystem _sexSystem;
     private float _dirtyTalkTimeout = 15;
+    private object _cumCheckEnumeratorState;
+    private object _dirtyTalkEnumeratorState;
 
     static MainDirtyTalkComponent() => ClassInjector.RegisterTypeInIl2Cpp<MainDirtyTalkComponent>();
 
@@ -40,8 +41,9 @@ public class MainDirtyTalkComponent : MonoBehaviour, IInitializeComponent
                 _ => 15
             };
 
-            MelonCoroutines.Start( CumCheckEnumerator());
-            MelonCoroutines.Start( DirtyTalkEnumerator());
+            StopCoroutines();
+            _cumCheckEnumeratorState = MelonCoroutines.Start( CumCheckEnumerator());
+            _dirtyTalkEnumeratorState = MelonCoroutines.Start( DirtyTalkEnumerator());
         }
         else
         {
@@ -49,7 +51,21 @@ public class MainDirtyTalkComponent : MonoBehaviour, IInitializeComponent
         }
     }
 
-    [HideFromIl2Cpp]
+    public void OnDestroy() => StopCoroutines();
+
+    private void StopCoroutines()
+    {
+        if (_cumCheckEnumeratorState != null)
+        {
+            MelonCoroutines.Stop(_cumCheckEnumeratorState);
+        }
+
+        if (_dirtyTalkEnumeratorState != null)
+        {
+            MelonCoroutines.Stop(_dirtyTalkEnumeratorState);
+        }
+    }
+
     private IEnumerator CumCheckEnumerator()
     {
         while (true)
@@ -67,7 +83,6 @@ public class MainDirtyTalkComponent : MonoBehaviour, IInitializeComponent
         }
     }
 
-    [HideFromIl2Cpp]
     private IEnumerator DirtyTalkEnumerator()
     {
         yield return new WaitForSeconds(_dirtyTalkTimeout);

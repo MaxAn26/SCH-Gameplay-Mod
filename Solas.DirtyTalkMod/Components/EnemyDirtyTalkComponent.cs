@@ -73,11 +73,11 @@ public class EnemyDirtyTalkComponent : MonoBehaviour, IInitializeComponent
 
                 if (EnemyDirtyTalkMod.EnemyTypes.Any(m => m.Gender is CharacterGender.Futa && m.EnemyTypes.Contains(enemyAI.typeOfEnemy)))
                 {
-                    _passiveEnemy = EnemyDirtyTalkMod.EnemyTypes.Where(m => m.Gender is CharacterGender.Futa && m.EnemyTypes.Contains(enemyAI.typeOfEnemy)).RandomItem();
+                    _activeEnemy = EnemyDirtyTalkMod.EnemyTypes.Where(m => m.Gender is CharacterGender.Futa && m.EnemyTypes.Contains(enemyAI.typeOfEnemy)).RandomItem();
                 }
                 else
                 {
-                    _passiveEnemy = EnemyDirtyTalkMod.FutaEnemy;
+                    _activeEnemy = EnemyDirtyTalkMod.FutaEnemy;
                 }
             }
         }
