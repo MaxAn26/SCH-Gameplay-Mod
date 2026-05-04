@@ -100,6 +100,7 @@ internal enum Fetish
     BreathPlay = 1 << 8,
 }
 
+[Flags]
 internal enum Weaknesses
 {
     None = 0,

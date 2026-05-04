@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <MainVersion>1.0</MainVersion>
+    <MainVersion>1.1</MainVersion>
     <BuildVersion>$([System.DateTime]::UtcNow.ToString(yy))$([System.DateTime]::UtcNow.DayOfYear.ToString(000))</BuildVersion>
     <VersionTime>$([System.DateTime]::UtcNow.ToString(HHmm))</VersionTime>
     <AssemblyVersion>$(MainVersion).$(BuildVersion).$(VersionTime)</AssemblyVersion>

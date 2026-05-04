@@ -33,7 +33,6 @@ internal class EnemySexExtendMod
             UseEnemyThreesomeChance = config.Entry(nameof(EnemySexExtendMod), nameof(UseEnemyThreesomeChance), false,
                 "Use threesome chance according with enemy type", new ModConfig.AcceptableValueList<bool>([true, false]));
 
-
             if (Enabled.Value)
             {
                 if (!JsonUtils.TryDeserialize(GameplayMod.PluginResources, "EnemySexTypes.json", out List<EnemySexModel> enemySexType))

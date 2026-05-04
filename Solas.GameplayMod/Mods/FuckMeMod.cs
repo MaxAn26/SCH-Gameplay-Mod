@@ -65,7 +65,12 @@ internal class FuckMeMod
     {
         do
         {
-            if (SexSystem is null || PlayerRigitbody is null || SexSystem.GameOver || SceneManager.GetActiveScene().buildIndex < 4)
+            if (SexSystem is null || PlayerRigitbody is null || SexSystem.WasCollected || PlayerRigitbody.WasCollected)
+            {
+                yield break;
+            }
+
+            if (SexSystem.GameOver || SceneManager.GetActiveScene().buildIndex < 4)
             {
                 yield break;
             }

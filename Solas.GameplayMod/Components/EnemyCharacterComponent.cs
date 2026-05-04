@@ -4,7 +4,6 @@ using BaseMod.Core.Extensions;
 using BaseMod.Core.Interfaces;
 using BaseMod.Core.Utils;
 using Il2Cpp;
-using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using Solas.GameplayMod.Models;
@@ -28,6 +27,7 @@ internal class EnemyCharacterComponent : MonoBehaviour, IInitializeComponent
 
     internal bool? IsActive;
     private int _glossTick = 0;
+    private object _smoothnessCoroutine;
 
     #region Il2Cpp .ctor
     static EnemyCharacterComponent() => ClassInjector.RegisterTypeInIl2Cpp<EnemyCharacterComponent>();
@@ -89,16 +89,28 @@ internal class EnemyCharacterComponent : MonoBehaviour, IInitializeComponent
             Destroy(this);
         }
     }
-    public void Start() => MelonCoroutines.Start(UpdateSmoothness());
+    public void Start()
+    {
+        StopCoroutine();
+        _smoothnessCoroutine = MelonCoroutines.Start(UpdateSmoothness());
+    }
+    public void OnDestroy() => StopCoroutine();
 
     internal IEnumerator UpdateSmoothness()
     {
-        yield return new WaitForSeconds(5f);
-
-        if (!UpdateSmoothnessDeviate() && !EnemyAI.isDead && !SexSystem.GameOver)
+        while (true)
         {
-            _glossTick++;
-            MelonCoroutines.Start(UpdateSmoothness());
+            yield return new WaitForSeconds(5f);
+
+            if (!GlossEffectMod.IsModActive || SexSystem.GameOver || EnemyAI.isDead)
+            {
+                yield break;
+            }
+
+            if (UpdateSmoothnessDeviate())
+            {
+                yield break;
+            }
         }
     }
 
@@ -109,6 +121,7 @@ internal class EnemyCharacterComponent : MonoBehaviour, IInitializeComponent
             return true;
         }
 
+        _glossTick++;
         float gloss = GlossEffectMod.GetGlossEffect(_glossTick);
 
         UpdateMaterialPropertyBlock(EnemyAI.EnSex.Character, 0, "_SmoothnessDeviate", gloss);
@@ -124,8 +137,27 @@ internal class EnemyCharacterComponent : MonoBehaviour, IInitializeComponent
 
     private void UpdateMaterialPropertyBlock(Renderer renderer, int index, string property, float value)
     {
+        if (renderer == null || renderer.WasCollected)
+        {
+            return;
+        }
+
+        if (index < 0 || index >= renderer.sharedMaterials.Count)
+        {
+            return;
+        }
+
         renderer.GetPropertyBlock(MaterialPropertyBlock, index);
         MaterialPropertyBlock.SetFloat(property, value);
         renderer.SetPropertyBlock(MaterialPropertyBlock, index);
+    }
+
+    private void StopCoroutine()
+    {
+        if (_smoothnessCoroutine != null)
+        {
+            MelonCoroutines.Stop(_smoothnessCoroutine);
+            _smoothnessCoroutine = null;
+        }
     }
 }
