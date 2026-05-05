@@ -40,8 +40,7 @@ public class EnemyDirtyTalkComponent : MonoBehaviour, IInitializeComponent
 
     public void Initialise(EnemyAI enemyAI)
     {
-        SexSystem sexSystem = GameObject.Find("Z Essentials(Clone)").GetComponentWithCast<SexSystem>();
-        if (enemyAI is not null && sexSystem is not null)
+        if (enemyAI is not null && Zessentials.Instance.gameObject.TryGetComponentWithCast(out SexSystem sexSystem))
         {
             _enemyAI = enemyAI;
             _sexSystem = sexSystem;
@@ -1081,10 +1080,36 @@ public class EnemyDirtyTalkComponent : MonoBehaviour, IInitializeComponent
         {
             string phrase = phrases.RandomItem();
 
-            if (!string.IsNullOrWhiteSpace(phrase))
+            if (IsCanTalk() && !string.IsNullOrWhiteSpace(phrase))
             {
                 _sexSystem.console.ConsoleWriteEnemy($"{_enemyAI.enemyName} says: {phrase}");
             }
+        }
+
+        bool IsCanTalk()
+        {
+            if (EnemyDirtyTalkMod.AllowAlways.Value)
+            {
+                return true;
+            }
+
+            if (_sexSystem.Enemy == _enemyAI.gameObject)
+            {
+                if (SexSystem.PlayerAttacker && !SexSystem.SexIsLickingTarget && !SexSystem.SexIsOralTarget
+                    || !SexSystem.PlayerAttacker && !SexSystem.SexIsLickingCaster && !SexSystem.SexIsOralCaster)
+                {
+                    return true;
+                }
+            }
+            else if (_sexSystem.Assist == _enemyAI.gameObject)
+            {
+                if (!SexSystem.SexIsLickingAssist && !SexSystem.SexIsOralAssist)
+                { 
+                    return true; 
+                }    
+            }
+                
+            return false;
         }
     }
 }

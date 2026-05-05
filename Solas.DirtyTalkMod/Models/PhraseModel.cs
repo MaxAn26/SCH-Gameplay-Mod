@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Solas.DirtyTalkMod.Models;
 public class PhraseModel
 {

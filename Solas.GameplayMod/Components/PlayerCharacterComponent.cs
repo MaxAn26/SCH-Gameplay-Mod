@@ -3,6 +3,7 @@ using System.Collections;
 using BaseMod.Core.Extensions;
 using BaseMod.Core.Interfaces;
 using Il2Cpp;
+using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using Solas.GameplayMod.Mods;
@@ -59,7 +60,8 @@ internal class PlayerCharacterComponent : MonoBehaviour, IInitializeComponent
         _smoothnessCoroutine = MelonCoroutines.Start(UpdateSmoothness());
     }
     public void OnDestroy() => StopCoroutine();
-
+    
+    [HideFromIl2Cpp]
     internal IEnumerator UpdateSmoothness()
     {
         while(true)

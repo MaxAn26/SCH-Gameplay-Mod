@@ -13,6 +13,7 @@ internal class EnemyDirtyTalkMod
 {
     #region Configuration
     internal static MelonPreferences_Entry<bool> Enabled;
+    internal static MelonPreferences_Entry<bool> AllowAlways;
     internal static MelonPreferences_Entry<int> AssistChance;
 
     internal static EnemyDirtyTalkModel FemaleEnemy;
@@ -35,6 +36,8 @@ internal class EnemyDirtyTalkMod
         {
             Enabled = config.Entry(nameof(EnemyDirtyTalkMod), nameof(Enabled), false,
                 "Activates the modification", new ModConfig.AcceptableValueList<bool>([true, false]));
+            AllowAlways = config.Entry(nameof(EnemyDirtyTalkMod), nameof(AllowAlways), false,
+                "Allow enemy speak when they cannot do it in reality: during lick or suck, or when gagged", new ModConfig.AcceptableValueList<bool>([true, false]));
             AssistChance = config.Entry(nameof(EnemyDirtyTalkMod), nameof(AssistChance), 20,
                 "Chance for using assist taunts instead of enemy taunt in threesome", new ModConfig.AcceptableValueRange<int>(0, 100));
 

@@ -1,13 +1,15 @@
-using System.Reflection;
 using BaseMod.Core;
+using BaseMod.Core.Extensions;
+using Il2Cpp;
 using MelonLoader;
 using MelonLoader.Utils;
 using Solas.DirtyTalkMod;
+using Solas.DirtyTalkMod.Components;
 using Solas.DirtyTalkMod.Mods;
 using Solas.DirtyTalkMod.Patches;
 
-[assembly: MelonInfo( typeof( DirtyTalkMod ), ModInfo.MOD_NAME, ModInfo.MOD_VERSION, ModInfo.MOD_DEVELOPER, ModInfo.MOD_URL )]
-[assembly: MelonGame( ModInfo.GAME_DEVELOPER, ModInfo.GAME_NAME )]
+[assembly: MelonInfo(typeof(DirtyTalkMod), ModInfo.MOD_NAME, ModInfo.MOD_VERSION, ModInfo.MOD_DEVELOPER, ModInfo.MOD_URL)]
+[assembly: MelonGame(ModInfo.GAME_DEVELOPER, ModInfo.GAME_NAME)]
 
 namespace Solas.DirtyTalkMod;
 public class DirtyTalkMod : MelonMod 
@@ -36,6 +38,26 @@ public class DirtyTalkMod : MelonMod
         HarmonyInstance.PatchAll(typeof(SexSystemPatch));
 
         Log.Msg($"Mod {ModInfo.MOD_GUID} is loaded!");
+    }
+
+    public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+    {
+        base.OnSceneWasLoaded(buildIndex, sceneName);
+
+        if (buildIndex >= 4 
+            && EnemyDirtyTalkMod.IsModActive && !CharacterData.Instance.adultSettingsDATA.DtalkEnemy || PlayerDirtyTalkMod.IsModActive && CharacterData.Instance.adultSettingsDATA.DtalkInner)
+        { 
+            Zessentials.instance.AddModComponent<MainDirtyTalkComponent>();
+        }
+    }
+    public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
+    {
+        base.OnSceneWasUnloaded(buildIndex, sceneName);
+
+        if (buildIndex >= 4)
+        { 
+            Zessentials.instance.RemoveModComponent<MainDirtyTalkComponent>();
+        }
     }
 
     public override void OnPreferencesSaved() {

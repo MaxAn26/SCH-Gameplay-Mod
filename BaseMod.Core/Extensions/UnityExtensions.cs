@@ -45,6 +45,16 @@ public static class UnityExtensions
         component?.Initialize();
     }
 
+    public static void RemoveModComponent<T>(this MonoBehaviour monoBehaviour)
+        where T : MonoBehaviour
+    {
+        T component = monoBehaviour?.gameObject.GetComponent<T>();
+        if (component != null)
+        {
+            UnityEngine.Object.Destroy(component);
+        }
+    }
+
     public static void AddComponentWithAction<T>(this MonoBehaviour monoBehaviour, Action<T> action)
         where T : Il2CppObjectBase
     {

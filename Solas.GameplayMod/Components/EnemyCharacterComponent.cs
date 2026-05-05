@@ -4,6 +4,7 @@ using BaseMod.Core.Extensions;
 using BaseMod.Core.Interfaces;
 using BaseMod.Core.Utils;
 using Il2Cpp;
+using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using Solas.GameplayMod.Models;
@@ -96,6 +97,7 @@ internal class EnemyCharacterComponent : MonoBehaviour, IInitializeComponent
     }
     public void OnDestroy() => StopCoroutine();
 
+    [HideFromIl2Cpp]
     internal IEnumerator UpdateSmoothness()
     {
         while (true)

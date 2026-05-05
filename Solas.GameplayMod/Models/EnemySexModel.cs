@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Solas.GameplayMod.Models;
 internal class EnemySexModel
 {
