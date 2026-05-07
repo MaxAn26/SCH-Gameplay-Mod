@@ -60,18 +60,19 @@ public class GameplayMod : MelonMod
         HarmonyInstance.PatchAll(typeof(PlayerSexPatch));
         HarmonyInstance.PatchAll(typeof(SexSystemPatch));
 
-        SceneManager.sceneLoaded += (UnityAction<Scene, LoadSceneMode>)OnSceneLoaded;
         Log.Msg($"Mod {ModInfo.MOD_GUID} is loaded!");
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    public override void OnSceneWasLoaded(int buildIndex, string sceneName)
     {
-        Log.Msg($"Scene loaded: Name: {scene.name}, BuildIndex: {scene.buildIndex}");
-        if (scene.buildIndex >= 4)
+        Log.Msg($"Scene loaded: Name: {sceneName}, BuildIndex: {buildIndex}");
+        if (buildIndex >= 4)
         {
             SexMoveChoiceMod.Prepare();
             EnemyTraitsMod.Reset();
         }
+
+        base.OnSceneWasLoaded(buildIndex, sceneName);
     }
 
     public override void OnPreferencesSaved()
