@@ -5,13 +5,17 @@ using Il2Cpp;
 using Solas.GameplayMod.Mods;
 
 namespace Solas.GameplayMod.Patches;
+
+[HarmonyPatch(typeof(SexSystem))]
 internal class SexSystemPatch
 {
     internal static bool Prepare()
     {
         try
         {
-            if (!FuckMeMod.IsModActive && !EnemySexExtendMod.IsModActive && !ExtraBondageTrapMod.IsModActive && !EnemyHPResetMod.IsModActive && !LustCageMod.IsModActive && !ObeyToEnemyMod.IsModActive && !SexDamageMod.IsModActive && !RandomEnemyRoleMod.IsModActive && !SexMoveChoiceMod.IsModActive && !SexInitiatorStateMod.IsModActive && !RandomReverseMod.IsModActive)
+            if (!FuckMeMod.IsModActive && !EnemySexExtendMod.IsModActive && !ExtraBondageTrapMod.IsModActive && !EnemyHPResetMod.IsModActive 
+                && !LustCageMod.IsModActive && !ObeyToEnemyMod.IsModActive && !SexDamageMod.IsModActive && !RandomEnemyRoleMod.IsModActive 
+                && !SexMoveChoiceMod.IsModActive && !SexInitiatorStateMod.IsModActive && !RandomReverseMod.IsModActive && !GameFixMod.IsModActive)
             {
                 return false;
             }
@@ -20,14 +24,14 @@ internal class SexSystemPatch
         }
         catch (Exception)
         {
-            GameplayMod.Log.Warning($"{nameof(SexSystemPatch)} not applied due exeption");
+            Core.LogWarning($"{nameof(SexSystemPatch)} not applied due exeption");
             return false;
         }
     }
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundPlayer))]
+    [HarmonyPatch(nameof(SexSystem.BoundPlayer))]
     static bool SexSystemBoundPlayerPrefix(SexSystem __instance, bool __runOriginal)
     {
         if (OrgasmControlMod.ApplyPunishmentOrgasm(__instance))
@@ -45,17 +49,17 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundPlayerTrap))]
+    [HarmonyPatch(nameof(SexSystem.BoundPlayerTrap))]
     static void SexSystemBoundPlayerTrapPostfix(SexSystem __instance) => ExtraBondageTrapMod.Apply(__instance);
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BreakRestraint))]
+    [HarmonyPatch(nameof(SexSystem.BreakRestraint))]
     static void SexSystemBreakRestraintPostfix(SexSystem __instance) => OrgasmControlMod.BreakPunishmentOrgasm(__instance);
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.CallbonusDom))]
+    [HarmonyPatch(nameof(SexSystem.CallbonusDom))]
     static bool SexSystemCallbonusDomPrefix(bool __runOriginal)
     {
         if (__runOriginal && ObeyToEnemyMod.IsActivated)
@@ -73,7 +77,7 @@ internal class SexSystemPatch
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.CallBonusEsc))]
+    [HarmonyPatch(nameof(SexSystem.CallBonusEsc))]
     static bool SexSystemCallBonusEscPrefix(SexSystem __instance, bool __runOriginal)
     {
         if (__runOriginal && LustCageMod.BlockEscape(__instance))
@@ -91,12 +95,12 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.InitializeSexSystem))]
+    [HarmonyPatch(nameof(SexSystem.InitializeSexSystem))]
     static void SexSystemInitializeSexSystemPostfix(SexSystem __instance) => FuckMeMod.Apply(__instance);
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.SetSexAnimation))]
+    [HarmonyPatch(nameof(SexSystem.SetSexAnimation))]
     static bool SexSystemSetSexAnimationPrefix(bool __runOriginal)
     {
         SexMoveChoiceMod.SetSexID();
@@ -111,7 +115,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.SetSexAnimation))]
+    [HarmonyPatch(nameof(SexSystem.SetSexAnimation))]
     static void SexSystemSetSexAnimationPostfix(SexSystem __instance)
     {
         EnemySexExtendMod.ReduceEnemyPower(__instance);
@@ -121,7 +125,7 @@ internal class SexSystemPatch
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.SetThreesomeAnimation))]
+    [HarmonyPatch(nameof(SexSystem.SetThreesomeAnimation))]
     static bool SexSystemSetThreesomeAnimationPrefix(bool __runOriginal)
     {
         SexMoveChoiceMod.SetSexID();
@@ -136,7 +140,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.SetThreesomeAnimation))]
+    [HarmonyPatch(nameof(SexSystem.SetThreesomeAnimation))]
     static void SexSystemSetThreesomeAnimationPostfix(SexSystem __instance)
     {
         OrgasmControlMod.ApplySexControl(__instance);
@@ -145,7 +149,7 @@ internal class SexSystemPatch
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.SetHeavyBondageAnimation))]
+    [HarmonyPatch(nameof(SexSystem.SetHeavyBondageAnimation))]
     static bool SexSystemSetHeavyBondageAnimationPrefix(bool __runOriginal)
     {
         SexMoveChoiceMod.SetSexID();
@@ -160,12 +164,12 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.SetHeavyBondageAnimation))]
+    [HarmonyPatch(nameof(SexSystem.SetHeavyBondageAnimation))]
     static void SexSystemSetHeavyBondageAnimationPostfix(SexSystem __instance) => OrgasmControlMod.ApplySexControl(__instance);
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.Setup))]
+    [HarmonyPatch(nameof(SexSystem.Setup))]
     static bool SexSystemSetupPrefix(SexSystem __instance, bool __runOriginal)
     {
         SexInitiatorStateMod.SetInitiator(__instance);
@@ -182,7 +186,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.Setup))]
+    [HarmonyPatch(nameof(SexSystem.Setup))]
     static void SexSystemSetupPostfix(SexSystem __instance)
     {
         SexMoveChoiceMod.SexSystem = __instance;
@@ -194,7 +198,7 @@ internal class SexSystemPatch
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.SexDamage))]
+    [HarmonyPatch(nameof(SexSystem.SexDamage))]
     static bool SexSystemSexDamagePrefix(SexSystem __instance, bool __runOriginal)
     {
         SexDamageMod.IsSexDamage = true;
@@ -210,7 +214,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.StartBukkake))]
+    [HarmonyPatch(nameof(SexSystem.StartBukkake))]
     static void SexSystemStartBukkakePostfix()
     {
         SexDamageMod.ResetStates();
@@ -219,7 +223,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.StartMasturbation))]
+    [HarmonyPatch(nameof(SexSystem.StartMasturbation))]
     static void SexSystemStartMasturbationPostfix()
     {
         SexDamageMod.ResetStates();
@@ -228,7 +232,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.StartSex))]
+    [HarmonyPatch(nameof(SexSystem.StartSex))]
     static void SexSystemStartSexPostfix(SexSystem __instance)
     {
         SexDamageMod.ResetStates();
@@ -239,7 +243,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.StartThreesome))]
+    [HarmonyPatch(nameof(SexSystem.StartThreesome))]
     static void SexSystemStartThreesomePostfix(SexSystem __instance)
     {
         SexDamageMod.ResetStates();
@@ -247,4 +251,9 @@ internal class SexSystemPatch
         ObeyToEnemyMod.Apply(__instance);
         LustCageMod.Apply(__instance);
     }
+
+    [HarmonyPostfix]
+    [HarmonyWrapSafe]
+    [HarmonyPatch(nameof(SexSystem.SetDicks))]
+    static void SexSystemSetDicksPostfix(SexSystem __instance) => GameFixMod.DickSetup(__instance);
 }

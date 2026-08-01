@@ -38,31 +38,31 @@ internal class LustCageMod
 
             if (Enabled.Value)
             {
-                if (!JsonUtils.TryDeserialize(GameplayMod.PluginConfigs, "LustCage_Male.json", out LustCageConfig maleConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, "LustCage_Male.json", out LustCageConfig maleConfig))
                 {
                     maleConfig = new LustCageConfig();
-                    _ = JsonUtils.TrySerialize(GameplayMod.PluginConfigs, "LustCage_Male.json", maleConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, "LustCage_Male.json", maleConfig);
                 }
                 LustCageMale = maleConfig;
 
-                if (!JsonUtils.TryDeserialize(GameplayMod.PluginConfigs, "LustCage_Female.json", out LustCageConfig femaleConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, "LustCage_Female.json", out LustCageConfig femaleConfig))
                 {
                     femaleConfig = new LustCageConfig();
-                    _ = JsonUtils.TrySerialize(GameplayMod.PluginConfigs, "LustCage_Female.json", femaleConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, "LustCage_Female.json", femaleConfig);
                 }
                 LustCageFemale = femaleConfig;
 
-                if (!JsonUtils.TryDeserialize(GameplayMod.PluginConfigs, "LustCage_Futa.json", out LustCageConfig futaConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, "LustCage_Futa.json", out LustCageConfig futaConfig))
                 {
                     futaConfig = new LustCageConfig();
-                    _ = JsonUtils.TrySerialize(GameplayMod.PluginConfigs, "LustCage_Futa.json", futaConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, "LustCage_Futa.json", futaConfig);
                 }
                 LustCageFuta = futaConfig;
             }
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -283,7 +283,7 @@ internal class LustCageMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return;
         }
     }

@@ -1,19 +1,18 @@
+using System.Runtime.CompilerServices;
 using BaseMod.Core;
 using MelonLoader;
+using MelonLoader.Logging;
 using MelonLoader.Utils;
 using Solas.GameplayMod;
 using Solas.GameplayMod.Mods;
-using Solas.GameplayMod.Patches;
-using UnityEngine.Events;
-using UnityEngine.SceneManagement;
 
-[assembly: MelonInfo(typeof(GameplayMod), ModInfo.MOD_NAME, ModInfo.MOD_VERSION, ModInfo.MOD_DEVELOPER, ModInfo.MOD_URL)]
+[assembly: HarmonyDontPatchAll]
+[assembly: MelonInfo(typeof(Core), ModInfo.MOD_NAME, ModInfo.MOD_VERSION, ModInfo.MOD_DEVELOPER, ModInfo.MOD_URL)]
 [assembly: MelonGame(ModInfo.GAME_DEVELOPER, ModInfo.GAME_NAME)]
 
 namespace Solas.GameplayMod;
-public class GameplayMod : MelonMod
+public class Core : MelonMod
 {
-    internal static MelonLogger.Instance Log;
     internal static ModConfig PluginConfig;
     internal static string ConfigPath;
     internal static string PluginAssets;
@@ -21,10 +20,9 @@ public class GameplayMod : MelonMod
     internal static string PluginResources;
 
     public override void OnInitializeMelon()
-    {
+    {        
         base.OnInitializeMelon();
-        // GameplayMod startup logic
-        Log = LoggerInstance;
+
         ConfigPath = MelonEnvironment.UserDataDirectory;
         PluginAssets = Path.Combine(ConfigPath, ModInfo.MOD_GUID, "Assets");
         PluginConfigs = Path.Combine(ConfigPath, ModInfo.MOD_GUID, "Configs");
@@ -39,6 +37,7 @@ public class GameplayMod : MelonMod
         EnemyTraitsMod.Load(PluginConfig);
         ExtraBondageTrapMod.Load(PluginConfig);
         FuckMeMod.Load(PluginConfig);
+        GameFixMod.Load(PluginConfig);
         GlossEffectMod.Load(PluginConfig);
         LustCageMod.Load(PluginConfig);
         ObeyToEnemyMod.Load(PluginConfig);
@@ -50,29 +49,21 @@ public class GameplayMod : MelonMod
         SexInitiatorStateMod.Load(PluginConfig);
         SexMoveChoiceMod.Load(PluginConfig);
 
-        HarmonyInstance.PatchAll(typeof(CaptureSystemPatch));
-        HarmonyInstance.PatchAll(typeof(EnemyActionsPatch));
-        HarmonyInstance.PatchAll(typeof(EnemyAIPatch));
-        HarmonyInstance.PatchAll(typeof(EnemySexPatch));
-        HarmonyInstance.PatchAll(typeof(HealthSystemPatch));
-        HarmonyInstance.PatchAll(typeof(PlayerCombatPatch));
-        HarmonyInstance.PatchAll(typeof(PlayerHealthSystemPatch));
-        HarmonyInstance.PatchAll(typeof(PlayerSexPatch));
-        HarmonyInstance.PatchAll(typeof(SexSystemPatch));
+        HarmonyInstance.PatchAll();
 
-        Log.Msg($"Mod {ModInfo.MOD_GUID} is loaded!");
+        LogInfo($"Mod {ModInfo.MOD_GUID} is loaded!");
     }
 
     public override void OnSceneWasLoaded(int buildIndex, string sceneName)
     {
-        Log.Msg($"Scene loaded: Name: {sceneName}, BuildIndex: {buildIndex}");
+        LogInfo($"Scene loaded: Name: {sceneName}, BuildIndex: {buildIndex}");
+        base.OnSceneWasLoaded(buildIndex, sceneName);
+
         if (buildIndex >= 4)
         {
             SexMoveChoiceMod.Prepare();
             EnemyTraitsMod.Reset();
         }
-
-        base.OnSceneWasLoaded(buildIndex, sceneName);
     }
 
     public override void OnPreferencesSaved()
@@ -81,4 +72,14 @@ public class GameplayMod : MelonMod
 
         base.OnPreferencesSaved();
     }
+
+    public static void LogTrace(string message, [CallerMemberName] string methodName = null) => MelonLogger.Msg(ColorARGB.DarkGray, Combine(message, methodName));
+    public static void LogDebug(string message, [CallerMemberName] string methodName = null) => MelonLogger.Msg(ColorARGB.Cyan, Combine(message, methodName));
+    public static void LogInfo(string message, [CallerMemberName] string methodName = null) => MelonLogger.Msg(ColorARGB.White, Combine(message, methodName));
+    public static void LogSuccess(string message, [CallerMemberName] string methodName = null) => MelonLogger.Msg(ColorARGB.Green, Combine(message, methodName));
+    public static void LogWarning(string message, [CallerMemberName] string methodName = null) => MelonLogger.Warning(Combine(message, methodName));
+    public static void LogError(Exception excepion, [CallerMemberName] string methodName = null) => LogError(excepion.Message, excepion, methodName);
+    public static void LogError(string message, Exception excepion, [CallerMemberName] string methodName = null) => MelonLogger.Error(Combine(message, methodName), excepion);
+
+    private static string Combine(string message, string methodName) => !string.IsNullOrWhiteSpace(methodName) ? $"{methodName}:> {message}" : message;
 }

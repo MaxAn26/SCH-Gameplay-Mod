@@ -3,6 +3,8 @@ using Il2Cpp;
 using Solas.GameplayMod.Mods;
 
 namespace Solas.GameplayMod.Patches;
+
+[HarmonyPatch(typeof(EnemyActions))]
 internal class EnemyActionsPatch
 {
     internal static bool Prepare()
@@ -18,14 +20,14 @@ internal class EnemyActionsPatch
         }
         catch (Exception)
         {
-            GameplayMod.Log.Warning($"{nameof(EnemyActionsPatch)} not applied due exeption");
+            Core.LogWarning($"{nameof(EnemyActionsPatch)} not applied due exeption");
             return false;
         }
     }
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(EnemyActions), nameof(EnemyActions.Hit))]
+    [HarmonyPatch(nameof(EnemyActions.Hit))]
     static bool EnemyActionsHitPrefix(EnemyActions __instance, bool __runOriginal)
     {
         CriticalHitMod.EnemyCriticalHit(__instance);

@@ -32,7 +32,7 @@ internal class EnemyHPResetMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -65,7 +65,7 @@ internal class EnemyHPResetMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return;
         }
     }

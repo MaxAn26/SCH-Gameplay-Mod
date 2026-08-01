@@ -38,7 +38,7 @@ public class PlayerDirtyTalkComponent : MonoBehaviour, IInitializeComponent
         else
         {
             Destroy(this);
-            DirtyTalkMod.Log.Msg("PlayerComponent Destroyed");
+            Core.LogInfo("PlayerComponent Destroyed");
         }
     }
 
@@ -91,7 +91,7 @@ public class PlayerDirtyTalkComponent : MonoBehaviour, IInitializeComponent
         else
         {
             Destroy(this);
-            DirtyTalkMod.Log.Msg("PlayerComponent Destroyed");
+            Core.LogInfo("PlayerComponent Destroyed");
         }
     }
 

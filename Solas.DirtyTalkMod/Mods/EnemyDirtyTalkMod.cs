@@ -43,38 +43,38 @@ internal class EnemyDirtyTalkMod
 
             if (Enabled.Value)
             {
-                if (!JsonUtils.TryDeserialize(DirtyTalkMod.PluginConfigs, $"EnemyMaleTaunt.json", out EnemyDirtyTalkModel maleConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"EnemyMaleTaunt.json", out EnemyDirtyTalkModel maleConfig))
                 {
                     maleConfig = new EnemyDirtyTalkModel();
-                    _ = JsonUtils.TrySerialize(DirtyTalkMod.PluginConfigs, $"EnemyMaleTaunt.json", maleConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"EnemyMaleTaunt.json", maleConfig);
                 }
                 MaleEnemy = maleConfig;
 
-                if (!JsonUtils.TryDeserialize(DirtyTalkMod.PluginConfigs, $"EnemyFemaleTaunt.json", out EnemyDirtyTalkModel femaleConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"EnemyFemaleTaunt.json", out EnemyDirtyTalkModel femaleConfig))
                 {
                     femaleConfig = new EnemyDirtyTalkModel();
-                    _ = JsonUtils.TrySerialize(DirtyTalkMod.PluginConfigs, $"EnemyFemaleTaunt.json", maleConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"EnemyFemaleTaunt.json", maleConfig);
                 }
                 FemaleEnemy = femaleConfig;
 
-                if (!JsonUtils.TryDeserialize(DirtyTalkMod.PluginConfigs, $"EnemyFutaTaunt.json", out EnemyDirtyTalkModel futaConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"EnemyFutaTaunt.json", out EnemyDirtyTalkModel futaConfig))
                 {
                     futaConfig = new EnemyDirtyTalkModel();
-                    _ = JsonUtils.TrySerialize(DirtyTalkMod.PluginConfigs, $"EnemyFutaTaunt.json", maleConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"EnemyFutaTaunt.json", maleConfig);
                 }
                 FutaEnemy = futaConfig;
 
-                if (JsonUtils.TryDeserializeFolder(Path.Combine(DirtyTalkMod.PluginConfigs, "ForEnemyTypes"), "Enemy*.json", out List<EnemyTypeDirtyTalkModel> list))
+                if (JsonUtils.TryDeserializeFolder(Path.Combine(Core.PluginConfigs, "ForEnemyTypes"), "Enemy*.json", out List<EnemyTypeDirtyTalkModel> list))
                 {
                     EnemyTypes.Clear();
                     EnemyTypes.AddRange(list);
-                    DirtyTalkMod.Log.Msg($"Load {list.Count} taunts for enemy types");
+                    Core.LogInfo($"Load {list.Count} taunts for enemy types");
                 }
             }
         }
         catch (Exception ex)
         {
-            DirtyTalkMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -96,7 +96,7 @@ internal class EnemyDirtyTalkMod
         }
         catch (Exception ex)
         {
-            DirtyTalkMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return;
         }
     }

@@ -49,7 +49,7 @@ internal class HealthComponent : MonoBehaviour, IInitializeComponent
         }
         catch (Exception e)
         {
-            GameplayMod.Log.Error(e);
+            Core.LogError(e);
             Destroy(this);
         }
     }

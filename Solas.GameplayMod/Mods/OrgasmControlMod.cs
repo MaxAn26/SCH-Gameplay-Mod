@@ -64,12 +64,12 @@ internal class OrgasmControlMod
             }
             else
             {
-                PunishmentOrgasmSprite = ResourcesUtils.LoadSprite(GameplayMod.PluginAssets, "belt.png");
+                PunishmentOrgasmSprite = ResourcesUtils.LoadSprite(Core.PluginAssets, "belt.png");
             }
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -118,7 +118,7 @@ internal class OrgasmControlMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return arousalDamage;
         }
     }
@@ -161,7 +161,7 @@ internal class OrgasmControlMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return;
         }
     }
@@ -194,7 +194,7 @@ internal class OrgasmControlMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
         }
     }
 
@@ -241,7 +241,7 @@ internal class OrgasmControlMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return false;
         }
     }

@@ -37,31 +37,31 @@ internal class ObeyToEnemyMod
 
             if (Enabled.Value)
             {
-                if (!JsonUtils.TryDeserialize(GameplayMod.PluginConfigs, $"ObeyToEnemy_Male.json", out ObeyToEnemyConfig maleConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"ObeyToEnemy_Male.json", out ObeyToEnemyConfig maleConfig))
                 {
                     maleConfig = new ObeyToEnemyConfig();
-                    _ = JsonUtils.TrySerialize(GameplayMod.PluginConfigs, $"ObeyToEnemy_Male.json", maleConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"ObeyToEnemy_Male.json", maleConfig);
                 }
                 ObeyToEnemyMale = maleConfig;
 
-                if (!JsonUtils.TryDeserialize(GameplayMod.PluginConfigs, $"ObeyToEnemy_Female.json", out ObeyToEnemyConfig femaleConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"ObeyToEnemy_Female.json", out ObeyToEnemyConfig femaleConfig))
                 {
                     femaleConfig = new ObeyToEnemyConfig();
-                    _ = JsonUtils.TrySerialize(GameplayMod.PluginConfigs, $"ObeyToEnemy_Female.json", femaleConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"ObeyToEnemy_Female.json", femaleConfig);
                 }
                 ObeyToEnemyFemale = femaleConfig;
 
-                if (!JsonUtils.TryDeserialize(GameplayMod.PluginConfigs, $"ObeyToEnemy_Futa.json", out ObeyToEnemyConfig futaConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"ObeyToEnemy_Futa.json", out ObeyToEnemyConfig futaConfig))
                 {
                     futaConfig = new ObeyToEnemyConfig();
-                    _ = JsonUtils.TrySerialize(GameplayMod.PluginConfigs, $"ObeyToEnemy_Futa.json", futaConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"ObeyToEnemy_Futa.json", futaConfig);
                 }
                 ObeyToEnemyFuta = futaConfig;
             }
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -97,7 +97,7 @@ internal class ObeyToEnemyMod
 
                 if (!IsActivated && config.OnHandRestraints && Character.statusDATA.IsBoundHandRestraint > 0)
                 {
-                    GameplayMod.Log.Msg("Set ObeyToEnemy due hand bound");
+                    Core.LogInfo("Set ObeyToEnemy due hand bound");
                     if (config.PlayerVictimOnHandRestraints)
                     {
                         PlayerVictim(sexSystem);
@@ -113,7 +113,7 @@ internal class ObeyToEnemyMod
                         PlayerVictim(sexSystem);
                     }
 
-                    GameplayMod.Log.Msg("Set ObeyToEnemy due equal roles");
+                    Core.LogInfo("Set ObeyToEnemy due equal roles");
                     IsActivated = true;
                 }
 
@@ -124,7 +124,7 @@ internal class ObeyToEnemyMod
                         PlayerVictim(sexSystem);
                     }
 
-                    GameplayMod.Log.Msg("Set ObeyToEnemy due equal gender");
+                    Core.LogInfo("Set ObeyToEnemy due equal gender");
                     IsActivated = true;
                 }
 
@@ -135,13 +135,13 @@ internal class ObeyToEnemyMod
                         PlayerVictim(sexSystem);
                     }
 
-                    GameplayMod.Log.Msg("Set ObeyToEnemy due enemy power random");
+                    Core.LogInfo("Set ObeyToEnemy due enemy power random");
                     IsActivated = true;
                 }
 
                 if (IsActivated)
                 {
-                    sexSystem.console.ConsoleWrite("Obey to enemy");
+                    sexSystem.console.ConsoleWrite("Obeying enemy");
                 }
 
                 IsInitialized = true;
@@ -149,7 +149,7 @@ internal class ObeyToEnemyMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return;
         }
     }

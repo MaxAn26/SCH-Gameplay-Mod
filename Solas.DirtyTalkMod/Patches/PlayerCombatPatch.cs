@@ -5,6 +5,8 @@ using Solas.DirtyTalkMod.Components;
 using Solas.DirtyTalkMod.Mods;
 
 namespace Solas.DirtyTalkMod.Patches;
+
+[HarmonyPatch(typeof(PlayerCombat))]
 internal class PlayerCombatPatch
 {
     internal static bool Prepare()
@@ -20,14 +22,14 @@ internal class PlayerCombatPatch
         }
         catch (Exception)
         {
-            DirtyTalkMod.Log.Warning($"{nameof(PlayerCombatPatch)} not applied due exeption");
+            Core.LogWarning($"{nameof(PlayerCombatPatch)} not applied due exeption");
             return false;
         }
     }
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(PlayerCombat), nameof(PlayerCombat.Start))]
+    [HarmonyPatch(nameof(PlayerCombat.Start))]
     [HarmonyPriority(Priority.High)]
     static void PlayerCombatStartPostfix(PlayerCombat __instance)
     {

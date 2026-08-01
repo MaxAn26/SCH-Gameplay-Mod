@@ -30,7 +30,7 @@ internal class CriticalHitMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -57,7 +57,7 @@ internal class CriticalHitMod
 
             if (RandomUtils.Chance(chance))
             {
-                GameplayMod.Log.Msg($"Player critical chance: {chance}");
+                Core.LogInfo($"Player critical chance: {chance}");
                 playerCombat.Sexscript.console.ConsoleWrite("Critical hit!");
                 playerCombat.healthSystem.SubstractHealth(playerCombat.healthSystem.CurrentHp - 2);
             }
@@ -66,7 +66,7 @@ internal class CriticalHitMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
             return;
         }
     }
@@ -101,7 +101,7 @@ internal class CriticalHitMod
 
             if (RandomUtils.Chance(chance))
             {
-                GameplayMod.Log.Msg($"Enemy critical chance: {chance}");
+                Core.LogInfo($"Enemy critical chance: {chance}");
                 enemyAI.Sexscript.console.ConsoleWrite($"{enemyAI.enemyName} get critical hit!");
                 enemyActions.healthSystem.SubstractHealth(enemyActions.healthSystem.CurrentHp - 2);
             }
@@ -110,7 +110,7 @@ internal class CriticalHitMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
             return;
         }
     }

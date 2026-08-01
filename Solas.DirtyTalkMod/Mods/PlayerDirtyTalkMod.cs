@@ -5,7 +5,6 @@ using Il2Cpp;
 using MelonLoader;
 using Solas.DirtyTalkMod.Components;
 using Solas.DirtyTalkMod.Models;
-
 using UnityEngine.SceneManagement;
 
 namespace Solas.DirtyTalkMod.Mods;
@@ -37,38 +36,38 @@ internal class PlayerDirtyTalkMod
 
             if (Enabled.Value)
             {
-                if (!JsonUtils.TryDeserialize(DirtyTalkMod.PluginConfigs, $"PlayerMaleThought.json", out PlayerDirtyTalkModel maleConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"PlayerMaleThought.json", out PlayerDirtyTalkModel maleConfig))
                 {
                     maleConfig = new PlayerDirtyTalkModel();
-                    _ = JsonUtils.TrySerialize(DirtyTalkMod.PluginConfigs, $"PlayerMaleThought.json", maleConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"PlayerMaleThought.json", maleConfig);
                 }
                 MalePlayer = maleConfig;
 
-                if (!JsonUtils.TryDeserialize(DirtyTalkMod.PluginConfigs, $"PlayerFemaleThought.json", out PlayerDirtyTalkModel femaleConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"PlayerFemaleThought.json", out PlayerDirtyTalkModel femaleConfig))
                 {
                     femaleConfig = new PlayerDirtyTalkModel();
-                    _ = JsonUtils.TrySerialize(DirtyTalkMod.PluginConfigs, $"PlayerFemaleThought.json", maleConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"PlayerFemaleThought.json", maleConfig);
                 }
                 FemalePlayer = femaleConfig;
 
-                if (!JsonUtils.TryDeserialize(DirtyTalkMod.PluginConfigs, $"PlayerFutaThought.json", out PlayerDirtyTalkModel futaConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"PlayerFutaThought.json", out PlayerDirtyTalkModel futaConfig))
                 {
                     futaConfig = new PlayerDirtyTalkModel();
-                    _ = JsonUtils.TrySerialize(DirtyTalkMod.PluginConfigs, $"PlayerFutaThought.json", maleConfig);
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"PlayerFutaThought.json", maleConfig);
                 }
                 FutaPlayer = futaConfig;
 
-                if (JsonUtils.TryDeserializeFolder(Path.Combine(DirtyTalkMod.PluginConfigs, "ForEnemyTypes"), "Player*.json", out List<PlayerDirtyTalkEnemyTypeModel> list))
+                if (JsonUtils.TryDeserializeFolder(Path.Combine(Core.PluginConfigs, "ForEnemyTypes"), "Player*.json", out List<PlayerDirtyTalkEnemyTypeModel> list))
                 {
                     PlayerEnemyTypes.Clear();
                     PlayerEnemyTypes.AddRange(list);
-                    DirtyTalkMod.Log.Msg($"Load {list.Count} thoughts for enemy types");
+                    Core.LogInfo($"Load {list.Count} thoughts for enemy types");
                 }
             }
         }
         catch (Exception ex)
         {
-            DirtyTalkMod.Log.Error(ex.Message);
+            Core.LogError( ex );
         }
     }
 
@@ -90,7 +89,7 @@ internal class PlayerDirtyTalkMod
         }
         catch (Exception ex)
         {
-            DirtyTalkMod.Log.Error(ex.Message);
+            Core.LogError( ex );
             return;
         }
     }

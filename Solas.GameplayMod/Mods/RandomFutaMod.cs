@@ -34,7 +34,7 @@ internal class RandomFutaMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -56,7 +56,7 @@ internal class RandomFutaMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return;
         }
     }
@@ -67,7 +67,7 @@ internal class RandomFutaMod
 
         if (RandomUtils.Chance(ChanceForFuta.Value))
         {
-            GameplayMod.Log.Msg($"{enemySex.gameObject.GetComponentWithCast<EnemyAI>()?.enemyName} will use a dick");
+            Core.LogInfo($"{enemySex.gameObject.GetComponentWithCast<EnemyAI>()?.enemyName} will use a dick");
 
             enemySex.Dick.sharedMesh = RandomUtils.Chance(ChanceForFullFuta.Value) ? enemySex.DickMesh : enemySex.DickHalfMesh;
             Material material = UnityEngine.Object.Instantiate(enemySex.DickMatF);
@@ -77,7 +77,7 @@ internal class RandomFutaMod
         }
         else
         {
-            GameplayMod.Log.Msg($"{enemySex.gameObject.GetComponentWithCast<EnemyAI>()?.enemyName} will use strapon");
+            Core.LogInfo($"{enemySex.gameObject.GetComponentWithCast<EnemyAI>()?.enemyName} will use strapon");
 
             enemySex.Dick.sharedMesh = enemySex.StrapMesh;
             Material material = UnityEngine.Object.Instantiate(enemySex.StrapMat);

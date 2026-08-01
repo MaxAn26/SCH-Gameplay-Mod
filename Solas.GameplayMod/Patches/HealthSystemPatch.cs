@@ -5,6 +5,7 @@ using Solas.GameplayMod.Mods;
 using UnityEngine.SceneManagement;
 
 namespace Solas.GameplayMod.Patches;
+[HarmonyPatch(typeof(HealthSystem))]
 internal class HealthSystemPatch
 {
     internal static bool Prepare()
@@ -20,14 +21,14 @@ internal class HealthSystemPatch
         }
         catch (Exception)
         {
-            GameplayMod.Log.Warning($"{nameof(HealthSystemPatch)} not applied due exception");
+            Core.LogWarning($"{nameof(HealthSystemPatch)} not applied due exception");
             return false;
         }
     }
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(HealthSystem), nameof(HealthSystem.IncreaseEc))]
+    [HarmonyPatch(nameof(HealthSystem.IncreaseEc))]
     static bool HealthSystemIncreaseEcPrefix(HealthSystem __instance, bool __runOriginal, ref int __0)
     {
         EnemyTraitsMod.ArousalDamage(__instance, ref __0);
@@ -47,7 +48,7 @@ internal class HealthSystemPatch
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(HealthSystem), nameof(HealthSystem.SubstractHealth))]
+    [HarmonyPatch(nameof(HealthSystem.SubstractHealth))]
     static bool HealthSystemSubstractHealthPrefix(HealthSystem __instance, bool __runOriginal, ref int __0)
     {
         EnemyTraitsMod.HealthDamage(__instance, ref __0);

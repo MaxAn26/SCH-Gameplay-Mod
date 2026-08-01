@@ -43,17 +43,17 @@ internal class EnemyTraitsMod
 
             if (Enabled.Value)
             {
-                if (!JsonUtils.TryDeserialize(GameplayMod.PluginResources, "EnemyTraits.json", out List<EnemyTraitModel> enemyTraits))
+                if (!JsonUtils.TryDeserialize(Core.PluginResources, "EnemyTraits.json", out List<EnemyTraitModel> enemyTraits))
                 {
                     enemyTraits = GetDefaultTraits();
-                    JsonUtils.TrySerialize(GameplayMod.PluginResources, "EnemyTraits.json", enemyTraits);
+                    JsonUtils.TrySerialize(Core.PluginResources, "EnemyTraits.json", enemyTraits);
                 }
                 EnemyTraits = enemyTraits;
             }
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -88,7 +88,7 @@ internal class EnemyTraitsMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return null;
         }
     }
@@ -157,7 +157,7 @@ internal class EnemyTraitsMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
             return;
         }
     }
@@ -184,7 +184,7 @@ internal class EnemyTraitsMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
         }
     }
 
@@ -210,7 +210,7 @@ internal class EnemyTraitsMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
         }
     }
 

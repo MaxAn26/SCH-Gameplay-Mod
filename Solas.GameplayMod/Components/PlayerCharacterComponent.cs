@@ -49,7 +49,7 @@ internal class PlayerCharacterComponent : MonoBehaviour, IInitializeComponent
         }
         catch (Exception e)
         {
-            GameplayMod.Log.Error(e);
+            Core.LogError(e);
             Destroy(this);
         }
     }

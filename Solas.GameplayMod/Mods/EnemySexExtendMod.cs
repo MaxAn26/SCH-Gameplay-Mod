@@ -35,10 +35,10 @@ internal class EnemySexExtendMod
 
             if (Enabled.Value)
             {
-                if (!JsonUtils.TryDeserialize(GameplayMod.PluginResources, "EnemySexTypes.json", out List<EnemySexModel> enemySexType))
+                if (!JsonUtils.TryDeserialize(Core.PluginResources, "EnemySexTypes.json", out List<EnemySexModel> enemySexType))
                 {
                     enemySexType = GetEnemySexTypes();
-                    JsonUtils.TrySerialize(GameplayMod.PluginResources, "EnemySexTypes.json", enemySexType);
+                    JsonUtils.TrySerialize(Core.PluginResources, "EnemySexTypes.json", enemySexType);
                 }
                 EnemySexTypes = enemySexType;
             }
@@ -49,7 +49,7 @@ internal class EnemySexExtendMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -90,7 +90,7 @@ internal class EnemySexExtendMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
         }
     }
 
@@ -123,7 +123,7 @@ internal class EnemySexExtendMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
             return null;
         }
     }
@@ -214,7 +214,7 @@ internal class EnemySexExtendMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return false;
         }
     }
@@ -272,7 +272,7 @@ internal class EnemySexExtendMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
             return false;
         }
     }
@@ -296,7 +296,7 @@ internal class EnemySexExtendMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 

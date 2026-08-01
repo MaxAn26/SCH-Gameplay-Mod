@@ -52,7 +52,7 @@ internal class SexDamageMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -84,7 +84,7 @@ internal class SexDamageMod
                 return;
             }
 
-            GameplayMod.Log.Msg("Player Cum");
+            Core.LogInfo("Player Cum");
             switch (SexInteraction)
             {
                 case SexInteraction.Masturbation:
@@ -146,7 +146,7 @@ internal class SexDamageMod
                         }
                     }
 
-                    GameplayMod.Log.Msg($"Player cum damage: {damage}");
+                    Core.LogInfo($"Player cum damage: {damage}");
                     IsPlayerCum = UpdatePlayerMaxHP(damage);
 
                     break;
@@ -154,7 +154,7 @@ internal class SexDamageMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
         }
     }
 
@@ -171,7 +171,7 @@ internal class SexDamageMod
                 return;
             }
 
-            GameplayMod.Log.Msg("Enemy Cum");
+            Core.LogInfo("Enemy Cum");
             if (SexSystem.enemyHealthSystem.CurrentEc >= SexSystem.enemyHealthSystem.MaxEc)
             {
                 _ = UpdatePlayerMaxHP(Mathf.RoundToInt(SexSystem.EnemyPower * 0.5f));
@@ -193,7 +193,7 @@ internal class SexDamageMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
         }
     }
 

@@ -67,7 +67,7 @@ internal class EnemyCharacterComponent : MonoBehaviour, IInitializeComponent
                 {
                     EnemyTraitsMod.ApplyTrait(enemyAI, trait);
                     EnemyTrait = trait;
-                    GameplayMod.Log.Msg($"Enemy '{EnemyAI.enemyName}' get {trait.Name} ({trait.TraitType}) trait");
+                    Core.LogInfo($"Enemy '{EnemyAI.enemyName}' get {trait.Name} ({trait.TraitType}) trait");
                 }
             }
 
@@ -86,7 +86,7 @@ internal class EnemyCharacterComponent : MonoBehaviour, IInitializeComponent
         }
         catch (Exception e)
         {
-            GameplayMod.Log.Error(e);
+            Core.LogError(e);
             Destroy(this);
         }
     }

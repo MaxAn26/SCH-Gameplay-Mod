@@ -48,7 +48,7 @@ internal class SexMoveChoiceMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -57,7 +57,7 @@ internal class SexMoveChoiceMod
         try
         {
             bool fromFile = false;
-            if (JsonUtils.TryDeserialize(GameplayMod.PluginResources, "SexMoves.json", out List<SexMoveExtended> extendedSexMoves))
+            if (JsonUtils.TryDeserialize(Core.PluginResources, "SexMoves.json", out List<SexMoveExtended> extendedSexMoves))
             {
                 fromFile = true;
             }
@@ -68,10 +68,10 @@ internal class SexMoveChoiceMod
 
             if (!fromFile)
             {
-                GameplayMod.Log.Msg("Creating SexMoves.json...");
+                Core.LogInfo("Creating SexMoves.json...");
                 List<SexMoveExtended> poses = [];
 
-                GameplayMod.Log.Msg("Try find SexMoves in Resources");
+                Core.LogInfo("Try find SexMoves in Resources");
                 Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> sexMoveObj = Resources.FindObjectsOfTypeAll(Il2CppType.From(typeof(SexMove)));
                 foreach (UnityEngine.Object moveObj in sexMoveObj)
                 {
@@ -86,17 +86,17 @@ internal class SexMoveChoiceMod
                         }
                     }
                 }
-                GameplayMod.Log.Msg($"Add {poses.Count}/{sexMoveObj.Count}");
+                Core.LogInfo($"Add {poses.Count}/{sexMoveObj.Count}");
 
                 poses.Sort();
-                if (JsonUtils.TrySerialize(GameplayMod.PluginResources, "SexMoves.json", poses))
+                if (JsonUtils.TrySerialize(Core.PluginResources, "SexMoves.json", poses))
                 {
                     extendedSexMoves = poses;
-                    GameplayMod.Log.Msg($"SexMoves.json was created in {GameplayMod.PluginResources}");
+                    Core.LogInfo($"SexMoves.json was created in {Core.PluginResources}");
                 }
                 else
                 {
-                    GameplayMod.Log.Msg($"SexMoves.json was not created");
+                    Core.LogInfo($"SexMoves.json was not created");
                 }
             }
 
@@ -115,7 +115,7 @@ internal class SexMoveChoiceMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -143,11 +143,11 @@ internal class SexMoveChoiceMod
 
             if (move is null)
             {
-                GameplayMod.Log.Msg("SexMove is NULL");
+                Core.LogInfo("SexMove is NULL");
                 return;
             }
 
-            GameplayMod.Log.Msg($"Set SexMove: ID: {move.ID}({move.Type}) Name: '{move.Name}'");
+            Core.LogInfo($"Set SexMove: ID: {move.ID}({move.Type}) Name: '{move.Name}'");
             if (SexSystem.IsThreesome)
             {
                 SexSystem.SexType = move.Type;
@@ -159,7 +159,7 @@ internal class SexMoveChoiceMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
         }
     }
 
@@ -251,7 +251,7 @@ internal class SexMoveChoiceMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -327,7 +327,7 @@ internal class SexMoveChoiceMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -352,7 +352,7 @@ internal class SexMoveChoiceMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
             return false;
         }
     }

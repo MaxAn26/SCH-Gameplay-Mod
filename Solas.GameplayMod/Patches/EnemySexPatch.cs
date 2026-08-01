@@ -3,6 +3,8 @@ using Il2Cpp;
 using Solas.GameplayMod.Mods;
 
 namespace Solas.GameplayMod.Patches;
+
+[HarmonyPatch(typeof(EnemySex))]
 internal class EnemySexPatch
 {
     internal static bool Prepare()
@@ -18,19 +20,19 @@ internal class EnemySexPatch
         }
         catch (Exception)
         {
-            GameplayMod.Log.Warning($"{nameof(EnemySexPatch)} not applied due exeption");
+            Core.LogWarning($"{nameof(EnemySexPatch)} not applied due exeption");
             return false;
         }
     }
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(EnemySex), nameof(EnemySex.Start))]
+    [HarmonyPatch(nameof(EnemySex.Start))]
     static void EnemySexStartPostfix(EnemySex __instance) => RandomFutaMod.Apply(__instance);
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(EnemySex), nameof(EnemySex.CumFX))]
+    [HarmonyPatch(nameof(EnemySex.CumFX))]
     static void EnemySexCumFXPostfix(EnemySex __instance)
     {
         SexInitiatorStateMod.Apply();

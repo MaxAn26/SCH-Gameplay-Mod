@@ -5,6 +5,8 @@ using Solas.GameplayMod.Components;
 using Solas.GameplayMod.Mods;
 
 namespace Solas.GameplayMod.Patches;
+
+[HarmonyPatch(typeof(PlayerCombat))]
 internal class PlayerCombatPatch
 {
     internal static bool Prepare()
@@ -20,14 +22,14 @@ internal class PlayerCombatPatch
         }
         catch (Exception)
         {
-            GameplayMod.Log.Warning($"{nameof(PlayerCombatPatch)} not applied due exeption");
+            Core.LogWarning($"{nameof(PlayerCombatPatch)} not applied due exeption");
             return false;
         }
     }
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(PlayerCombat), nameof(PlayerCombat.Start))]
+    [HarmonyPatch(nameof(PlayerCombat.Start))]
     static void PlayerCombatStartPostfix(PlayerCombat __instance)
     {
         __instance.AddModComponent<PlayerCharacterComponent>();
@@ -36,7 +38,7 @@ internal class PlayerCombatPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(PlayerCombat), nameof(PlayerCombat.Death))]
+    [HarmonyPatch(nameof(PlayerCombat.Death))]
     static void PlayerCombatDeathPostfix()
     {
         SexDamageMod.ResetMod();
@@ -45,7 +47,7 @@ internal class PlayerCombatPatch
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(PlayerCombat), nameof(PlayerCombat.Hit))]
+    [HarmonyPatch(nameof(PlayerCombat.Hit))]
     static bool PlayerCombatHitPrefix(PlayerCombat __instance, bool __runOriginal)
     {
         CriticalHitMod.PlayerCriticalHit(__instance);
@@ -60,7 +62,7 @@ internal class PlayerCombatPatch
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(PlayerCombat), nameof(PlayerCombat.GUNHit))]
+    [HarmonyPatch(nameof(PlayerCombat.GUNHit))]
     static bool PlayerCombatGUNHitPrefix(PlayerCombat __instance, bool __runOriginal)
     {
         CriticalHitMod.PlayerCriticalHit(__instance);

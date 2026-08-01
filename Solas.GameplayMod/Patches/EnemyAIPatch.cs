@@ -5,6 +5,7 @@ using Solas.GameplayMod.Components;
 using Solas.GameplayMod.Mods;
 
 namespace Solas.GameplayMod.Patches;
+[HarmonyPatch(typeof(EnemyAI))]
 internal class EnemyAIPatch
 {
     internal static bool Prepare()
@@ -15,14 +16,14 @@ internal class EnemyAIPatch
         }
         catch (Exception)
         {
-            GameplayMod.Log.Warning($"{nameof(EnemyAIPatch)} not applied due exeption");
+            Core.LogWarning($"{nameof(EnemyAIPatch)} not applied due exeption");
             return false;
         }
     }
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(EnemyAI), nameof(EnemyAI.Start))]
+    [HarmonyPatch(nameof(EnemyAI.Start))]
     static void EnemyAIStartPostfix(EnemyAI __instance)
     {
         __instance.AddModComponent<EnemyCharacterComponent>();
@@ -31,7 +32,7 @@ internal class EnemyAIPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(EnemyAI), nameof(EnemyAI.EndSex))]
+    [HarmonyPatch(nameof(EnemyAI.EndSex))]
     static void EnemyAIEndSexPostfix()
     {
         EnemyHPResetMod.Reset();
@@ -42,7 +43,7 @@ internal class EnemyAIPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(EnemyAI), nameof(EnemyAI.EndSexDeath))]
+    [HarmonyPatch(nameof(EnemyAI.EndSexDeath))]
     static void EnemyAIEndSexDeathPostfix()
     {
         EnemyHPResetMod.Reset();

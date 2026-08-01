@@ -46,7 +46,7 @@ internal class CapturedSlaveMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex.Message);
+            Core.LogError(ex);
         }
     }
 
@@ -77,7 +77,7 @@ internal class CapturedSlaveMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
             return;
         }
     }
@@ -99,7 +99,7 @@ internal class CapturedSlaveMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
             return;
         }
     }
@@ -123,7 +123,7 @@ internal class CapturedSlaveMod
         }
         catch (Exception ex)
         {
-            GameplayMod.Log.Error(ex);
+            Core.LogError(ex);
         }
     }
 

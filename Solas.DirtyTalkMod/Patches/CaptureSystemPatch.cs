@@ -12,6 +12,8 @@ using Solas.DirtyTalkMod.Mods;
 using UnityEngine;
 
 namespace Solas.DirtyTalkMod.Patches;
+
+[HarmonyPatch(typeof(CaptureSystem))]
 internal class CaptureSystemPatch
 {
     internal static bool Prepare()
@@ -27,14 +29,14 @@ internal class CaptureSystemPatch
         }
         catch (Exception)
         {
-            DirtyTalkMod.Log.Warning($"{nameof(CaptureSystemPatch)} not applied due exeption");
+            Core.LogWarning($"{nameof(CaptureSystemPatch)} not applied due exeption");
             return false;
         }
     }
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(CaptureSystem), nameof(CaptureSystem.Start))]
+    [HarmonyPatch(nameof(CaptureSystem.Start))]
     static void CaptureSystemStartPostfix(CaptureSystem __instance)
     {
         #region fix init

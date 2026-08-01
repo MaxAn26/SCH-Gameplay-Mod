@@ -1,11 +1,12 @@
 using BaseMod.Core.Extensions;
-
 using HarmonyLib;
 using Il2Cpp;
 using Solas.DirtyTalkMod.Components;
 using Solas.DirtyTalkMod.Mods;
 
 namespace Solas.DirtyTalkMod.Patches;
+
+[HarmonyPatch(typeof(SexSystem))]
 internal class SexSystemPatch
 {
     internal static bool Prepare()
@@ -21,17 +22,17 @@ internal class SexSystemPatch
         }
         catch (Exception)
         {
-            DirtyTalkMod.Log.Warning($"{nameof(SexSystemPatch)} not applied due exeption");
+            Core.LogWarning($"{nameof(SexSystemPatch)} not applied due exeption");
             return false;
         }
     }
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundHandCuffs))]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundLegCufffs))]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundHarness))]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundNippleClamp))]
+    [HarmonyPatch(nameof(SexSystem.BoundHandCuffs))]
+    [HarmonyPatch(nameof(SexSystem.BoundLegCufffs))]
+    [HarmonyPatch(nameof(SexSystem.BoundHarness))]
+    [HarmonyPatch(nameof(SexSystem.BoundNippleClamp))]
     static void SexSystemBoundGeneralPostfix(SexSystem __instance)
     {
         if (__instance.Enemy is null)
@@ -45,7 +46,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundCollar))]
+    [HarmonyPatch(nameof(SexSystem.BoundCollar))]
     static void SexSystemBoundCollarPostfix(SexSystem __instance)
     {
         if (__instance.Enemy is null)
@@ -59,7 +60,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundGag))]
+    [HarmonyPatch(nameof(SexSystem.BoundGag))]
     static void SexSystemBoundGagPostfix(SexSystem __instance)
     {
         if (__instance.Enemy is null)
@@ -73,7 +74,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundVibrator))]
+    [HarmonyPatch(nameof(SexSystem.BoundVibrator))]
     static void SexSystemBoundVibratorPostfix(SexSystem __instance)
     {
         if (__instance.Enemy is null)
@@ -87,7 +88,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundPlug))]
+    [HarmonyPatch(nameof(SexSystem.BoundPlug))]
     static void SexSystemBoundPlugPostfix(SexSystem __instance)
     {
         if (__instance.Enemy is null)
@@ -101,7 +102,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundBlindfold))]
+    [HarmonyPatch(nameof(SexSystem.BoundBlindfold))]
     static void SexSystemBoundBlindfoldPostfix(SexSystem __instance)
     {
         if (__instance.Enemy is null)
@@ -115,7 +116,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundHandRestraint))]
+    [HarmonyPatch(nameof(SexSystem.BoundHandRestraint))]
     static void SexSystemBoundHandRestraintPostfix(SexSystem __instance)
     {
         if (__instance.Enemy is null)
@@ -129,7 +130,7 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.BoundLegRestraint))]
+    [HarmonyPatch(nameof(SexSystem.BoundLegRestraint))]
     static void SexSystemBoundLegRestraintPostfix(SexSystem __instance)
     {
         if (__instance.Enemy is null)
@@ -143,11 +144,11 @@ internal class SexSystemPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.GrappleBeforeSex))]
+    [HarmonyPatch(nameof(SexSystem.GrappleBeforeSex))]
     static void SexSystemGrappleBeforeSexPostfix(SexSystem __instance) => __instance.Enemy?.GetComponentWithCast<EnemyDirtyTalkComponent>()?.EnemyGrapple();
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(SexSystem), nameof(SexSystem.PlayerGrappleBeforeSex))]
+    [HarmonyPatch(nameof(SexSystem.PlayerGrappleBeforeSex))]
     static void SexSystemPlayerGrappleBeforeSexPostfix(SexSystem __instance) => __instance.Player.GetComponentWithCast<PlayerDirtyTalkComponent>()?.PlayerGrapple();
 }

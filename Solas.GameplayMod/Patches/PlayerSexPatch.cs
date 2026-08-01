@@ -3,6 +3,8 @@ using Il2Cpp;
 using Solas.GameplayMod.Mods;
 
 namespace Solas.GameplayMod.Patches;
+
+[HarmonyPatch(typeof(PlayerSex))]
 internal class PlayerSexPatch
 {
     internal static bool Prepare()
@@ -18,14 +20,14 @@ internal class PlayerSexPatch
         }
         catch (Exception)
         {
-            GameplayMod.Log.Warning($"{nameof(PlayerSexPatch)} not applied due exeption");
+            Core.LogWarning($"{nameof(PlayerSexPatch)} not applied due exeption");
             return false;
         }
     }
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(PlayerSex), nameof(PlayerSex.CumFX))]
+    [HarmonyPatch(nameof(PlayerSex.CumFX))]
     static void PlayerSexCumFXPostfix()
     {
         SexDamageMod.PlayerCum();
@@ -34,6 +36,6 @@ internal class PlayerSexPatch
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    [HarmonyPatch(typeof(PlayerSex), nameof(PlayerSex.Escape))]
+    [HarmonyPatch(nameof(PlayerSex.Escape))]
     static void PlayerSexEscapePostfix() => SexMoveChoiceMod.InteractionCounts = 0;
 }
