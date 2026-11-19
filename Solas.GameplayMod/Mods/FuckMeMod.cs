@@ -96,17 +96,18 @@ internal class FuckMeMod
 
                     if (RandomUtils.Chance(chance))
                     {
+                        Core.LogDebug("Fuck me");
                         SexSystem.console.ConsoleWrite("Fuck me");
-                        SexSystem.CanMove = false;
-                        PlayerRigitbody.velocity = Vector3.zero;
-                        PlayerRigitbody.angularVelocity = Vector3.zero;
+                        //SexSystem.CanMove = false;
+                        //PlayerRigitbody.velocity = Vector3.zero;
+                        //PlayerRigitbody.angularVelocity = Vector3.zero;
                         SexSystem.Taunt();
-                        yield return new WaitForSeconds(5f);
-                        SexSystem.CanMove = true;
+                        //yield return new WaitForSeconds(5f);
+                        //SexSystem.CanMove = true;
                     }
                 }
             }
-            yield return new WaitForSeconds(10f);
+            yield return new WaitForSeconds(15f);
         } while (true);
     }
 }

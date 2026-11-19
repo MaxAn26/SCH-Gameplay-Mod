@@ -24,11 +24,7 @@ internal class EnemyAIPatch
     [HarmonyPostfix]
     [HarmonyWrapSafe]
     [HarmonyPatch(nameof(EnemyAI.Start))]
-    static void EnemyAIStartPostfix(EnemyAI __instance)
-    {
-        __instance.AddModComponent<EnemyCharacterComponent>();
-        __instance.AddModComponent<HealthComponent>();
-    }
+    static void EnemyAIStartPostfix(EnemyAI __instance) => __instance.AddModComponent<EnemyCharacterComponent>();
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]

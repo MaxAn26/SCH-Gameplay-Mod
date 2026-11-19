@@ -4,6 +4,7 @@ using BaseMod.Core.Utils;
 using Il2Cpp;
 using MelonLoader;
 using Solas.GameplayMod.Components;
+using Solas.GameplayMod.Enums;
 using Solas.GameplayMod.Models;
 using static BaseMod.Core.ModConfig;
 
@@ -102,25 +103,25 @@ internal class EnemyTraitsMod
                 return;
             }
 
-            if (enemyTrait.HealthOperation is not TraitOperation.None)
+            if (enemyTrait.Health.Operation is not TraitOperation.None)
             {
                 int origin = (enemyAI.healthSystem.MaxHp - 70) / 50;
-                int newValue = enemyTrait.CalculateValue(enemyTrait.HealthOperation, origin, enemyTrait.HealthValue);
+                int newValue = enemyTrait.CalculateTrait(enemyTrait.Health, origin);
                 enemyAI.healthSystem.MaxHp = 70 + newValue * 50;
                 enemyAI.healthSystem.CurrentHp = enemyAI.healthSystem.MaxHp;
                 enemyAI.healthSystem.SendHealthUpdateEvent();
             }
 
-            if (enemyTrait.ArmorOperation is not TraitOperation.None)
+            if (enemyTrait.Armor.Operation is not TraitOperation.None)
             {
                 int origin = enemyAI.healthSystem.Armor / 6;
-                int newValue = enemyTrait.CalculateValue(enemyTrait.ArmorOperation, origin, enemyTrait.ArmorValue);
+                int newValue = enemyTrait.CalculateTrait(enemyTrait.Armor, origin);
                 enemyAI.healthSystem.Armor = newValue * 6;
             }
 
-            if (enemyTrait.RegenerationOperation is not TraitOperation.None)
+            if (enemyTrait.Regeneration.Operation is not TraitOperation.None)
             {
-                int newValue = enemyTrait.CalculateValue(enemyTrait.RegenerationOperation, enemyAI.healthSystem.Regeneration, enemyTrait.RegenerationValue);
+                int newValue = enemyTrait.CalculateTrait(enemyTrait.Regeneration, enemyAI.healthSystem.Regeneration);
 
                 int oldValue = enemyAI.healthSystem.Regeneration;
                 enemyAI.healthSystem.Regeneration = newValue;
@@ -131,27 +132,27 @@ internal class EnemyTraitsMod
                 }
             }
 
-            if (enemyTrait.PowerOperation is not TraitOperation.None)
+            if (enemyTrait.Power.Operation is not TraitOperation.None)
             {
-                int newValue = enemyTrait.CalculateValue(enemyTrait.PowerOperation, enemyAI.EnSex.Power, enemyTrait.PowerValue);
+                int newValue = enemyTrait.CalculateTrait(enemyTrait.Power, enemyAI.EnSex.Power);
                 enemyAI.EnSex.Power = newValue;
             }
 
-            if (enemyTrait.ResistanceOperation is not TraitOperation.None)
+            if (enemyTrait.Resistance.Operation is not TraitOperation.None)
             {
-                int newValue = enemyTrait.CalculateValue(enemyTrait.ResistanceOperation, enemyAI.EnSex.Resistance, enemyTrait.ResistanceValue);
+                int newValue = enemyTrait.CalculateTrait(enemyTrait.Resistance, enemyAI.EnSex.Resistance);
                 enemyAI.EnSex.Resistance = newValue;
             }
 
-            if (enemyTrait.LustfulOperation is not TraitOperation.None)
+            if (enemyTrait.Lustful.Operation is not TraitOperation.None)
             {
-                int newValue = enemyTrait.CalculateValue(enemyTrait.LustfulOperation, enemyAI.EnSex.Prowess, enemyTrait.LustfulValue);
+                int newValue = enemyTrait.CalculateTrait(enemyTrait.Lustful, enemyAI.EnSex.Prowess);
                 enemyAI.EnSex.Prowess = newValue;
             }
 
-            if (enemyTrait.RestraintChanceOperation is not TraitOperation.None)
+            if (enemyTrait.RestraintChance.Operation is not TraitOperation.None)
             {
-                int newValue = enemyTrait.CalculateValue(enemyTrait.RestraintChanceOperation, enemyAI.EnSex.RestraintChance, enemyTrait.RestraintChanceValue);
+                int newValue = enemyTrait.CalculateTrait(enemyTrait.RestraintChance, enemyAI.EnSex.RestraintChance);
                 enemyAI.EnSex.RestraintChance = newValue;
             }
         }
@@ -176,7 +177,7 @@ internal class EnemyTraitsMod
                 return;
             }
 
-            if (enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.Invulnerable is CharacterInvulnerable.SexHealth)
+            if (enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.Invulnerable is TraitInvulnerable.SexHealth)
             {
                 damage = 0;
             }
@@ -202,7 +203,7 @@ internal class EnemyTraitsMod
                 return;
             }
 
-            if (enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.Invulnerable is CharacterInvulnerable.Pleasure)
+            if (enemyCharacter.EnemyTrait is not null && enemyCharacter.EnemyTrait.Invulnerable is TraitInvulnerable.Pleasure)
             {
                 damage = 0;
             }
@@ -226,29 +227,49 @@ internal class EnemyTraitsMod
             new() {
                 Name = "Default",
                 TraitType = TraitType.General,
-                HealthOperation = TraitOperation.Random
+                Armor = new(),
+                Health = new EnemyTraitModel.Trait{ Operation = TraitOperation.Random },
+                Lustful = new(),
+                Power = new(),
+                Regeneration = new(),
+                Resistance = new(),
+                RestraintChance = new(),
             },
             new() {
                 Name = "SexDoll",
-                TraitType = TraitType.MiniBoss,
-                Invulnerable = CharacterInvulnerable.Pleasure,
-                HealthOperation = TraitOperation.Random,
-                RestraintChanceOperation = TraitOperation.Replace,
-                RestraintChanceValue = 0,
-                RegenerationOperation = TraitOperation.Replace,
-                RegenerationValue = 2,
+                TraitType = TraitType.Enhanced,
+                Invulnerable = TraitInvulnerable.Pleasure,
+                Armor = new(),
+                Health = new() { Operation = TraitOperation.Random },
+                Lustful = new(),
+                Power = new(),
+                Regeneration = new() { Operation = TraitOperation.Replace, Value = 2 },
+                Resistance = new(),
+                RestraintChance = new() { Operation = TraitOperation.Replace, Value = 0 },
             },
             new() {
                 Name = "SexDrone",
                 TraitType = TraitType.MiniBoss,
-                Invulnerable = CharacterInvulnerable.Pleasure,
-                HealthOperation = TraitOperation.Random,
-                PowerOperation = TraitOperation.Replace,
-                PowerValue = 10,
-                RestraintChanceOperation = TraitOperation.Replace,
-                RestraintChanceValue = 0,
-                RegenerationOperation = TraitOperation.Replace,
-                RegenerationValue = 2,
+                Invulnerable = TraitInvulnerable.Pleasure,
+                Armor = new(),
+                Health = new() { Operation = TraitOperation.Random },
+                Lustful = new() { Operation = TraitOperation.Random },
+                Power = new() { Operation = TraitOperation.Random },
+                Regeneration = new() { Operation = TraitOperation.Replace, Value = 2 },
+                Resistance = new(),
+                RestraintChance = new() { Operation = TraitOperation.Replace, Value = 0 },
+            },
+            new() {
+                Name = "Vampire",
+                TraitType = TraitType.MiniBoss,
+                Invulnerable = TraitInvulnerable.SexHealth,
+                Armor = new() { Operation = TraitOperation.Random },
+                Health = new() { Operation = TraitOperation.Random },
+                Lustful = new() { Operation = TraitOperation.Random },
+                Power = new() { Operation = TraitOperation.Random },
+                Regeneration = new() { Operation = TraitOperation.Replace, Value = 5 },
+                Resistance = new() { Operation = TraitOperation.Random },
+                RestraintChance = new() { Operation = TraitOperation.Replace, Value = 5 },
             },
         ];
 

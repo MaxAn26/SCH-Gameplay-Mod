@@ -10,7 +10,7 @@ using Solas.DirtyTalkMod.Mods;
 using UnityEngine;
 
 namespace Solas.DirtyTalkMod.Components;
-public class PlayerDirtyTalkComponent : MonoBehaviour, IInitializeComponent 
+public class PlayerDirtyTalkComponent : MonoBehaviour, IInitializeComponent
 {
     public bool IsInitialised = false;
 

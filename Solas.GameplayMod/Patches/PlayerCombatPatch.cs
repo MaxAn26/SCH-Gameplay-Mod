@@ -30,11 +30,7 @@ internal class PlayerCombatPatch
     [HarmonyPostfix]
     [HarmonyWrapSafe]
     [HarmonyPatch(nameof(PlayerCombat.Start))]
-    static void PlayerCombatStartPostfix(PlayerCombat __instance)
-    {
-        __instance.AddModComponent<PlayerCharacterComponent>();
-        __instance.AddModComponent<HealthComponent>();
-    }
+    static void PlayerCombatStartPostfix(PlayerCombat __instance) => __instance.AddModComponent<PlayerCharacterComponent>();
 
     [HarmonyPostfix]
     [HarmonyWrapSafe]

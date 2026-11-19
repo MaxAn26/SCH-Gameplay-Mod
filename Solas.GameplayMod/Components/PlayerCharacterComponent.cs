@@ -60,11 +60,11 @@ internal class PlayerCharacterComponent : MonoBehaviour, IInitializeComponent
         _smoothnessCoroutine = MelonCoroutines.Start(UpdateSmoothness());
     }
     public void OnDestroy() => StopCoroutine();
-    
+
     [HideFromIl2Cpp]
     internal IEnumerator UpdateSmoothness()
     {
-        while(true)
+        while (true)
         {
             yield return new WaitForSeconds(5f);
 

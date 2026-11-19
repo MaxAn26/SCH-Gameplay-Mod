@@ -66,7 +66,7 @@ internal class SexDamageMod
     {
         try
         {
-            if (!Enabled.Value || SexSystem is null || SceneManager.GetActiveScene().buildIndex <= 4)
+            if (!Enabled.Value || IsPlayerCum || SexSystem is null || SceneManager.GetActiveScene().buildIndex <= 4)
             {
                 return;
             }
@@ -101,9 +101,8 @@ internal class SexDamageMod
 
                     IsPlayerCum = UpdatePlayerMaxHP(mastDamage);
                     break;
-                case SexInteraction.Undefined:
-                    break;
-                default:
+                case SexInteraction.Sex:
+                case SexInteraction.Threesome:
                     int damage = 0;
                     if (OrgasmControlMod.IsModActive && OrgasmControlMod.OrgasmControl is OrgasmControl.PunishmentOrgasm)
                     {
@@ -144,11 +143,17 @@ internal class SexDamageMod
                                 damage -= Math.Max(SexSystem.RecentlyFucked, 0);
                             }
                         }
+
+                        if (SexSystem.Domination >= 950)
+                        {
+                            damage /= 2;
+                        }
                     }
 
                     Core.LogInfo($"Player cum damage: {damage}");
                     IsPlayerCum = UpdatePlayerMaxHP(damage);
-
+                    break;
+                default:
                     break;
             }
         }

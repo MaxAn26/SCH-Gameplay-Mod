@@ -66,7 +66,7 @@ internal class CaptureSystemPatch
         }
         #endregion
 
-        MelonCoroutines.Start( CaptureDirtyTalkEnumerator(__instance));
+        MelonCoroutines.Start(CaptureDirtyTalkEnumerator(__instance));
     }
 
     static IEnumerator CaptureDirtyTalkEnumerator(CaptureSystem captureSystem)

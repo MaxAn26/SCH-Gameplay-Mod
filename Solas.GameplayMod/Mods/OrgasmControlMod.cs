@@ -4,7 +4,7 @@ using BaseMod.Core.Utils;
 using Il2Cpp;
 using MelonLoader;
 using Solas.GameplayMod.Components;
-using Solas.GameplayMod.Models;
+using Solas.GameplayMod.Enums;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,7 +16,6 @@ internal class OrgasmControlMod
 {
     #region Configuration
     internal static MelonPreferences_Entry<bool> Enabled;
-    internal static MelonPreferences_Entry<bool> ArousalFatigue;
     internal static MelonPreferences_Entry<bool> SelfControl;
     internal static MelonPreferences_Entry<int> SelfControlChance;
     internal static MelonPreferences_Entry<bool> DeniedOrgasm;
@@ -39,8 +38,6 @@ internal class OrgasmControlMod
         {
             Enabled = config.Entry(nameof(OrgasmControlMod), nameof(Enabled), false,
                 "Activates the modification", new AcceptableValueList<bool>([true, false]));
-            ArousalFatigue = config.Entry(nameof(OrgasmControlMod), nameof(ArousalFatigue), true,
-                "After cum character gain arouse slowly for a while", new AcceptableValueList<bool>([true, false]));
             SelfControl = config.Entry(nameof(OrgasmControlMod), nameof(SelfControl), true,
                 "Target character may control his own orgasm and will cum with caster", new AcceptableValueList<bool>([true, false]));
             SelfControlChance = config.Entry(nameof(OrgasmControlMod), nameof(SelfControlChance), 10,
@@ -58,7 +55,6 @@ internal class OrgasmControlMod
 
             if (!Enabled.Value)
             {
-                ArousalFatigue.Value = false;
                 SelfControl.Value = false;
                 PunishmentOrgasm.Value = false;
             }
@@ -70,56 +66,6 @@ internal class OrgasmControlMod
         catch (Exception ex)
         {
             Core.LogError(ex);
-        }
-    }
-
-    internal static int ArousalFatigueCheck(GameObject gameObject, int arousalDamage)
-    {
-        try
-        {
-            if (!Enabled.Value || !ArousalFatigue.Value)
-            {
-                return arousalDamage;
-            }
-
-            if (arousalDamage <= 0)
-            {
-                return 0;
-            }
-
-            if (!gameObject.TryGetComponentWithCast(out HealthComponent healthComponent))
-            {
-                return arousalDamage;
-            }
-
-            float deltaTime = Time.time - healthComponent.LastCumTime;
-            float rate = 1f;
-            if (healthComponent.IsCharacterSelfCum)
-            {
-                if (deltaTime < 15f)
-                {
-                    rate = 0.5f;
-                }
-                else if (deltaTime < 30f)
-                {
-                    rate = 0.75f;
-                }
-            }
-            else
-            {
-                if (deltaTime < 15f)
-                {
-                    rate = 0.75f;
-                }
-            }
-
-            float newArousal = arousalDamage * rate;
-            return Mathf.Max(1, Mathf.RoundToInt(newArousal));
-        }
-        catch (Exception ex)
-        {
-            Core.LogError(ex);
-            return arousalDamage;
         }
     }
 
@@ -139,14 +85,15 @@ internal class OrgasmControlMod
 
             EnemyCharacterComponent enemyComponent = sexSystem.Enemy.GetComponentWithCast<EnemyCharacterComponent>();
             string enemyName = enemyComponent?.EnemyAI.enemyName ?? "Enemy";
-            CharacterInvulnerable enemyPleasure = enemyComponent?.EnemyTrait?.Invulnerable ?? CharacterInvulnerable.None;
-            if (SelfControl.Value && enemyPleasure is not CharacterInvulnerable.Pleasure && RandomUtils.Chance(SelfControlChance.Value))
+            TraitInvulnerable enemyPleasure = enemyComponent?.EnemyTrait?.Invulnerable ?? TraitInvulnerable.None;
+            if (SelfControl.Value && enemyPleasure is not TraitInvulnerable.Pleasure && RandomUtils.Chance(SelfControlChance.Value))
             {
                 OrgasmControl = OrgasmControl.SelfControl;
                 string text = SexSystem.PlayerAttacker
                     ? $"{enemyName} controls their arousal in order to climax together with you"
                     : "You control your arousal in order to climax together with your partner";
 
+                Core.LogDebug(text);
                 sexSystem.console.ConsoleWrite(text);
             }
             else if (DeniedOrgasm.Value && RandomUtils.Chance(DeniedOrgasmChance.Value))
@@ -156,6 +103,7 @@ internal class OrgasmControlMod
                     ? $"{enemyName} controls their arousal by delaying their orgasm"
                     : "You control your arousal by delaying your orgasm";
 
+                Core.LogDebug(text);
                 sexSystem.console.ConsoleWrite(text);
             }
         }
@@ -233,6 +181,7 @@ internal class OrgasmControlMod
                 OrgasmControl = OrgasmControl.PunishmentOrgasm;
                 string enemyName = sexSystem.Enemy.TryGetComponentWithCast(out EnemyAI enemyAI) ? enemyAI.enemyName : "Enemy";
                 AddIcon(sexSystem, PunishmentOrgasmSprite);
+                Core.LogDebug($"{enemyName} put on Player Punishment Orgasm buff");
                 sexSystem.console.ConsoleWrite($"{enemyName} put on you Punishment Orgasm buff");
                 return true;
             }

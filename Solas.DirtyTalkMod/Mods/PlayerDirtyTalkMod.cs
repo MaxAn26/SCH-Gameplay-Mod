@@ -67,7 +67,7 @@ internal class PlayerDirtyTalkMod
         }
         catch (Exception ex)
         {
-            Core.LogError( ex );
+            Core.LogError(ex);
         }
     }
 
@@ -89,7 +89,7 @@ internal class PlayerDirtyTalkMod
         }
         catch (Exception ex)
         {
-            Core.LogError( ex );
+            Core.LogError(ex);
             return;
         }
     }

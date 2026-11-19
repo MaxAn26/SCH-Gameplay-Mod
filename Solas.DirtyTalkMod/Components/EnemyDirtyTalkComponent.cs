@@ -1104,11 +1104,11 @@ public class EnemyDirtyTalkComponent : MonoBehaviour, IInitializeComponent
             else if (_sexSystem.Assist == _enemyAI.gameObject)
             {
                 if (!SexSystem.SexIsLickingAssist && !SexSystem.SexIsOralAssist)
-                { 
-                    return true; 
-                }    
+                {
+                    return true;
+                }
             }
-                
+
             return false;
         }
     }

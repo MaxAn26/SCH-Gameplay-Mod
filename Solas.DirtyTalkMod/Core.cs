@@ -14,23 +14,23 @@ using Solas.DirtyTalkMod.Mods;
 [assembly: MelonGame(ModInfo.GAME_DEVELOPER, ModInfo.GAME_NAME)]
 
 namespace Solas.DirtyTalkMod;
-public class Core : MelonMod 
+public class Core : MelonMod
 {
     internal static ModConfig PluginConfig;
     internal static string ConfigPath;
     internal static string PluginConfigs;
 
-    public override void OnInitializeMelon() 
+    public override void OnInitializeMelon()
     {
         base.OnInitializeMelon();
 
         ConfigPath = MelonEnvironment.UserDataDirectory;
-        PluginConfigs = Path.Combine( ConfigPath, ModInfo.MOD_GUID, "Configs" );
+        PluginConfigs = Path.Combine(ConfigPath, ModInfo.MOD_GUID, "Configs");
 
-        PluginConfig = new( $"{ModInfo.MOD_GUID}.cfg" );
+        PluginConfig = new($"{ModInfo.MOD_GUID}.cfg");
 
-        EnemyDirtyTalkMod.Load( PluginConfig );
-        PlayerDirtyTalkMod.Load( PluginConfig );
+        EnemyDirtyTalkMod.Load(PluginConfig);
+        PlayerDirtyTalkMod.Load(PluginConfig);
 
         HarmonyInstance.PatchAll();
 
@@ -47,9 +47,9 @@ public class Core : MelonMod
             return;
         }
 
-        if (EnemyDirtyTalkMod.IsModActive && !CharacterData.Instance.adultSettingsDATA.DtalkEnemy 
+        if (EnemyDirtyTalkMod.IsModActive && !CharacterData.Instance.adultSettingsDATA.DtalkEnemy
             || PlayerDirtyTalkMod.IsModActive && CharacterData.Instance.adultSettingsDATA.DtalkInner)
-        { 
+        {
             Zessentials.instance.AddModComponent<MainDirtyTalkComponent>();
         }
     }
@@ -58,12 +58,13 @@ public class Core : MelonMod
         base.OnSceneWasUnloaded(buildIndex, sceneName);
 
         if (buildIndex >= 4)
-        { 
+        {
             Zessentials.instance.RemoveModComponent<MainDirtyTalkComponent>();
         }
     }
 
-    public override void OnPreferencesSaved() {
+    public override void OnPreferencesSaved()
+    {
         PluginConfig?.Save();
 
         base.OnPreferencesSaved();

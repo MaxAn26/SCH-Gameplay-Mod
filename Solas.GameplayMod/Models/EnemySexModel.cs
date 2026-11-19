@@ -1,3 +1,5 @@
+using Solas.GameplayMod.Enums;
+
 namespace Solas.GameplayMod.Models;
 internal class EnemySexModel
 {
@@ -39,7 +41,7 @@ internal class EnemySexModel
         {
             return true;
         }
-        else if (SexTags.HasFlag(SexTag.Wrestling) && sexMove.IsWresting)
+        else if (SexTags.HasFlag(SexTag.Wresting) && sexMove.IsWresting)
         {
             return true;
         }
@@ -67,46 +69,4 @@ internal class EnemySexModel
     }
 
     public override int GetHashCode() => EnemyType.GetHashCode();
-}
-
-[Flags]
-internal enum SexTag
-{
-    None = 0,
-    NoTag = 1 << 0,
-    Dominant = 1 << 1,
-    Sensual = 1 << 2,
-    Service = 1 << 3,
-    Smothering = 1 << 4,
-    Wrestling = 1 << 5,
-    Punishment = 1 << 6
-}
-
-[Flags]
-internal enum Fetish
-{
-    None = 0,
-    NoFetish = 1 << 0,
-    Dominant = 1 << 1,
-    Submissive = 1 << 2,
-    Romance = 1 << 3,
-    Masochist = 1 << 4,
-    Sadist = 1 << 5,
-    Bondage = 1 << 6,
-    Wrestling = 1 << 7,
-    BreathPlay = 1 << 8,
-}
-
-[Flags]
-internal enum Weaknesses
-{
-    None = 0,
-    NoWeaknesses = 1 << 0,
-    Orals = 1 << 1,
-    HandJobs = 1 << 2,
-    BreastPlay = 1 << 3,
-    FootPlay = 1 << 4,
-    MissionaryStyle = 1 << 5,
-    DoggyStyle = 1 << 6,
-    MountingStyle = 1 << 7,
 }

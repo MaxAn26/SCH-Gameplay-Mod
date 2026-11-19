@@ -43,8 +43,8 @@ public class MainDirtyTalkComponent : MonoBehaviour, IInitializeComponent
             };
 
             StopCoroutines();
-            _cumCheckEnumeratorState = MelonCoroutines.Start( CumCheckEnumerator());
-            _dirtyTalkEnumeratorState = MelonCoroutines.Start( DirtyTalkEnumerator());
+            _cumCheckEnumeratorState = MelonCoroutines.Start(CumCheckEnumerator());
+            _dirtyTalkEnumeratorState = MelonCoroutines.Start(DirtyTalkEnumerator());
         }
         else
         {
@@ -75,7 +75,7 @@ public class MainDirtyTalkComponent : MonoBehaviour, IInitializeComponent
             yield return new WaitForSeconds(1);
             if (SexSystem.IsCumming && !_cumThoughtRunning)
             {
-                MelonCoroutines.Start( CumEnumerator());
+                MelonCoroutines.Start(CumEnumerator());
                 _cumThoughtRunning = true;
             }
             else if (!SexSystem.IsCumming)

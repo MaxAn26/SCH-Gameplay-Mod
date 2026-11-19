@@ -13,8 +13,8 @@ internal class SexSystemPatch
     {
         try
         {
-            if (!FuckMeMod.IsModActive && !EnemySexExtendMod.IsModActive && !ExtraBondageTrapMod.IsModActive && !EnemyHPResetMod.IsModActive 
-                && !LustCageMod.IsModActive && !ObeyToEnemyMod.IsModActive && !SexDamageMod.IsModActive && !RandomEnemyRoleMod.IsModActive 
+            if (!FuckMeMod.IsModActive && !EnemySexExtendMod.IsModActive && !ExtraBondageTrapMod.IsModActive && !EnemyHPResetMod.IsModActive
+                && !PlayerWeaknessMod.IsModActive && !ObeyToEnemyMod.IsModActive && !SexDamageMod.IsModActive && !RandomEnemyRoleMod.IsModActive
                 && !SexMoveChoiceMod.IsModActive && !SexInitiatorStateMod.IsModActive && !RandomReverseMod.IsModActive && !GameFixMod.IsModActive)
             {
                 return false;
@@ -62,7 +62,7 @@ internal class SexSystemPatch
     [HarmonyPatch(nameof(SexSystem.CallbonusDom))]
     static bool SexSystemCallbonusDomPrefix(bool __runOriginal)
     {
-        if (__runOriginal && ObeyToEnemyMod.IsActivated)
+        if (ObeyToEnemyMod.IsActivated)
         {
             __runOriginal = false;
         }
@@ -80,7 +80,7 @@ internal class SexSystemPatch
     [HarmonyPatch(nameof(SexSystem.CallBonusEsc))]
     static bool SexSystemCallBonusEscPrefix(SexSystem __instance, bool __runOriginal)
     {
-        if (__runOriginal && LustCageMod.BlockEscape(__instance))
+        if (__runOriginal && PlayerWeaknessMod.BlockEscape(__instance))
         {
             __runOriginal = false;
         }
@@ -121,6 +121,7 @@ internal class SexSystemPatch
         EnemySexExtendMod.ReduceEnemyPower(__instance);
         OrgasmControlMod.ApplySexControl(__instance);
         RandomReverseMod.Apply(__instance);
+        PlayerWeaknessMod.Apply(__instance);
     }
 
     [HarmonyPrefix]
@@ -145,6 +146,7 @@ internal class SexSystemPatch
     {
         OrgasmControlMod.ApplySexControl(__instance);
         RandomReverseMod.Apply(__instance);
+        PlayerWeaknessMod.Apply(__instance);
     }
 
     [HarmonyPrefix]
@@ -165,13 +167,18 @@ internal class SexSystemPatch
     [HarmonyPostfix]
     [HarmonyWrapSafe]
     [HarmonyPatch(nameof(SexSystem.SetHeavyBondageAnimation))]
-    static void SexSystemSetHeavyBondageAnimationPostfix(SexSystem __instance) => OrgasmControlMod.ApplySexControl(__instance);
+    static void SexSystemSetHeavyBondageAnimationPostfix(SexSystem __instance)
+    {
+        OrgasmControlMod.ApplySexControl(__instance);
+        PlayerWeaknessMod.Apply(__instance);
+    }
 
     [HarmonyPrefix]
     [HarmonyWrapSafe]
     [HarmonyPatch(nameof(SexSystem.Setup))]
     static bool SexSystemSetupPrefix(SexSystem __instance, bool __runOriginal)
     {
+        SexDamageMod.ResetStates();
         SexInitiatorStateMod.SetInitiator(__instance);
         OrgasmControlMod.ResetSelfControl();
         EnemySexExtendMod.UpdateThreesome(__instance);
@@ -238,7 +245,6 @@ internal class SexSystemPatch
         SexDamageMod.ResetStates();
         SexDamageMod.SexInteraction = SexInteraction.Sex;
         ObeyToEnemyMod.Apply(__instance);
-        LustCageMod.Apply(__instance);
     }
 
     [HarmonyPostfix]
@@ -249,7 +255,6 @@ internal class SexSystemPatch
         SexDamageMod.ResetStates();
         SexDamageMod.SexInteraction = SexInteraction.Threesome;
         ObeyToEnemyMod.Apply(__instance);
-        LustCageMod.Apply(__instance);
     }
 
     [HarmonyPostfix]

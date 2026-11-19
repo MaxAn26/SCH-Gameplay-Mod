@@ -7,6 +7,7 @@ using Il2Cpp;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
+using Solas.GameplayMod.Enums;
 using Solas.GameplayMod.Models;
 using Solas.GameplayMod.Mods;
 

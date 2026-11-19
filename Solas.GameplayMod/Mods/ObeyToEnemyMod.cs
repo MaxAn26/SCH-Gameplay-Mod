@@ -2,6 +2,7 @@ using BaseMod.Core;
 using BaseMod.Core.Utils;
 using Il2Cpp;
 using MelonLoader;
+using Solas.GameplayMod.Enums;
 using Solas.GameplayMod.Models;
 
 using UnityEngine.SceneManagement;
@@ -13,9 +14,7 @@ internal class ObeyToEnemyMod
     #region Configuration
     internal static MelonPreferences_Entry<bool> Enabled;
 
-    internal static ObeyToEnemyConfig ObeyToEnemyMale;
-    internal static ObeyToEnemyConfig ObeyToEnemyFemale;
-    internal static ObeyToEnemyConfig ObeyToEnemyFuta;
+    internal static ObeyToEnemyConfig ObeyToEnemy;
     #endregion
 
     #region States
@@ -37,26 +36,12 @@ internal class ObeyToEnemyMod
 
             if (Enabled.Value)
             {
-                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"ObeyToEnemy_Male.json", out ObeyToEnemyConfig maleConfig))
+                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"ObeyToEnemy.json", out ObeyToEnemyConfig obeyConfig))
                 {
-                    maleConfig = new ObeyToEnemyConfig();
-                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"ObeyToEnemy_Male.json", maleConfig);
+                    obeyConfig = new ObeyToEnemyConfig();
+                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"ObeyToEnemy.json", obeyConfig);
                 }
-                ObeyToEnemyMale = maleConfig;
-
-                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"ObeyToEnemy_Female.json", out ObeyToEnemyConfig femaleConfig))
-                {
-                    femaleConfig = new ObeyToEnemyConfig();
-                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"ObeyToEnemy_Female.json", femaleConfig);
-                }
-                ObeyToEnemyFemale = femaleConfig;
-
-                if (!JsonUtils.TryDeserialize(Core.PluginConfigs, $"ObeyToEnemy_Futa.json", out ObeyToEnemyConfig futaConfig))
-                {
-                    futaConfig = new ObeyToEnemyConfig();
-                    _ = JsonUtils.TrySerialize(Core.PluginConfigs, $"ObeyToEnemy_Futa.json", futaConfig);
-                }
-                ObeyToEnemyFuta = futaConfig;
+                ObeyToEnemy = obeyConfig;
             }
         }
         catch (Exception ex)
@@ -76,18 +61,18 @@ internal class ObeyToEnemyMod
 
             if (!IsInitialized && !IsActivated)
             {
-                ObeyToEnemyConfig config = null;
+                ObeyToEnemyConfig.Conditions config = null;
                 if (sexSystem.PlayerMale)
                 {
-                    config = ObeyToEnemyMale;
+                    config = ObeyToEnemy.Male;
                 }
                 else if (Character.adultSettingsDATA.FutaPlayerMode)
                 {
-                    config = ObeyToEnemyFuta;
+                    config = ObeyToEnemy.Futa;
                 }
                 else
                 {
-                    config = ObeyToEnemyFemale;
+                    config = ObeyToEnemy.Female;
                 }
 
                 if (config is null)
@@ -95,48 +80,61 @@ internal class ObeyToEnemyMod
                     return;
                 }
 
-                if (!IsActivated && config.OnHandRestraints && Character.statusDATA.IsBoundHandRestraint > 0)
+                if (Character.statusDATA.IsBoundHandRestraint > 0)
                 {
-                    Core.LogInfo("Set ObeyToEnemy due hand bound");
-                    if (config.PlayerVictimOnHandRestraints)
+                    if (config.Base.HasFlag(ObeyCondition.Bound))
+                    {
+                        Core.LogInfo("Set ObeyToEnemy due hand bound");
+                        IsActivated = true;
+                    }
+
+                    if (config.Victim.HasFlag(ObeyCondition.Bound))
                     {
                         PlayerVictim(sexSystem);
                     }
-
-                    IsActivated = true;
                 }
 
-                if (!IsActivated && config.AtSameRole && sexSystem.TargetActive == sexSystem.CasterActive)
+
+                if (sexSystem.TargetActive == sexSystem.CasterActive)
                 {
-                    if (config.PlayerVictimAtSameRole)
+                    if (config.Base.HasFlag(ObeyCondition.SameRole))
+                    {
+                        Core.LogInfo("Set ObeyToEnemy due equal roles");
+                        IsActivated = true;
+                    }
+
+                    if (config.Victim.HasFlag(ObeyCondition.SameRole))
                     {
                         PlayerVictim(sexSystem);
                     }
-
-                    Core.LogInfo("Set ObeyToEnemy due equal roles");
-                    IsActivated = true;
                 }
 
-                if (!IsActivated && config.AtSameGender && sexSystem.TargetMale == sexSystem.CasterMale)
+                if (sexSystem.TargetMale == sexSystem.CasterMale)
                 {
-                    if (config.PlayerVictimAtSameGender)
+                    if (config.Base.HasFlag(ObeyCondition.SameGender))
+                    {
+                        Core.LogInfo("Set ObeyToEnemy due equal gender");
+                        IsActivated = true;
+                    }
+
+                    if (config.Victim.HasFlag(ObeyCondition.SameGender))
                     {
                         PlayerVictim(sexSystem);
                     }
-
-                    Core.LogInfo("Set ObeyToEnemy due equal gender");
-                    IsActivated = true;
                 }
 
-                if (!IsActivated && config.RandomByEnemyPower && RandomUtils.Chance(sexSystem.EnemyPower * 2))
+                if (RandomUtils.Chance(sexSystem.EnemyPower * 2))
                 {
-                    if (config.PlayerVictimRandomByEnemyPower)
+                    if (config.Base.HasFlag(ObeyCondition.EnemyPower))
+                    {
+                        Core.LogInfo("Set ObeyToEnemy due enemy power random");
+                        IsActivated = true;
+                    }
+
+                    if (config.Victim.HasFlag(ObeyCondition.EnemyPower))
                     {
                         PlayerVictim(sexSystem);
                     }
-
-                    Core.LogInfo("Set ObeyToEnemy due enemy power random");
-                    IsActivated = true;
                 }
 
                 if (IsActivated)

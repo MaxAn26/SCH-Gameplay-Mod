@@ -20,7 +20,7 @@ public class Core : MelonMod
     internal static string PluginResources;
 
     public override void OnInitializeMelon()
-    {        
+    {
         base.OnInitializeMelon();
 
         ConfigPath = MelonEnvironment.UserDataDirectory;
@@ -39,9 +39,10 @@ public class Core : MelonMod
         FuckMeMod.Load(PluginConfig);
         GameFixMod.Load(PluginConfig);
         GlossEffectMod.Load(PluginConfig);
-        LustCageMod.Load(PluginConfig);
+        //LustCageMod.Load(PluginConfig);
         ObeyToEnemyMod.Load(PluginConfig);
         OrgasmControlMod.Load(PluginConfig);
+        PlayerWeaknessMod.Load(PluginConfig);
         RandomEnemyRoleMod.Load(PluginConfig);
         RandomFutaMod.Load(PluginConfig);
         RandomReverseMod.Load(PluginConfig);

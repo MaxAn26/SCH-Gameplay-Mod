@@ -4,6 +4,7 @@ using BaseMod.Core.Utils;
 using Il2Cpp;
 using MelonLoader;
 using Solas.GameplayMod.Components;
+using Solas.GameplayMod.Enums;
 using Solas.GameplayMod.Models;
 
 using UnityEngine;
@@ -323,7 +324,7 @@ internal class EnemySexExtendMod
                 CasterWeaknesses = Weaknesses.DoggyStyle | Weaknesses.MountingStyle | Weaknesses.NoWeaknesses,
                 TargetWeaknesses = Weaknesses.BreastPlay | Weaknesses.Orals | Weaknesses.FootPlay | Weaknesses.NoWeaknesses,
                 UseTag = true,
-                SexTags = SexTag.Wrestling | SexTag.Dominant | SexTag.Punishment
+                SexTags = SexTag.Wresting | SexTag.Dominant | SexTag.Punishment
             },
             new() {
                 Name = "Ninja",
@@ -334,7 +335,7 @@ internal class EnemySexExtendMod
                 CasterWeaknesses = Weaknesses.NoWeaknesses,
                 TargetWeaknesses = Weaknesses.NoWeaknesses | Weaknesses.Orals | Weaknesses.HandJobs,
                 UseTag = true,
-                SexTags = SexTag.Wrestling | SexTag.Smothering
+                SexTags = SexTag.Wresting | SexTag.Smothering
             },
             new() {
                 Name = "Police",

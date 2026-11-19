@@ -1,0 +1,14 @@
+{
+  "Female": {
+    "Base": "Bound, EnemyPower",
+    "Victim": "Bound"
+  },
+  "Futa": {
+    "Base": "Bound, EnemyPower",
+    "Victim": "Bound"
+  },
+  "Male": {
+    "Base": "Bound, EnemyPower",
+    "Victim": "Bound"
+  }
+}
