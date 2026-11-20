@@ -85,7 +85,7 @@ internal class PlayerWeaknessMod
             }
 
             Character.statusDATA.WeaknessList.Clear();
-            List<int> sexTypes = []; 
+            List<int> sexTypes = [];
 
             int sexType = SexMoveChoiceMod.LastSexMove.Type;
 
@@ -171,7 +171,7 @@ internal class PlayerWeaknessMod
                     break;
                 case 9:
                     playerConfig.ActionByFlag(Weaknesses.Threesome, () => SetWeaknesses([sexType, 9]), () => RemoveWeaknesses([sexType, 9]));
-                                        
+
                     if (CheckCombinations([], [SexSystem.SexIsLickingCaster, SexSystem.SexIsOralCaster, SexSystem.SexIsLickingAssist, SexSystem.SexIsOralAssist]))
                     {
                         playerConfig.ActionByFlag(Weaknesses.OralTaker, () => SetWeaknesses([sexType, 9]), () => RemoveWeaknesses([sexType, 9]));
@@ -186,7 +186,7 @@ internal class PlayerWeaknessMod
                     }
                     else if (sexSystem.IsSex)
                     {
-                        if (CheckCombinations([],[!sexSystem.CasterActive, !sexSystem.TargetActive, !sexSystem.CasterMale, !sexSystem.TargetMale, !sexSystem.AssistActive, !sexSystem.AssistMale]))
+                        if (CheckCombinations([], [!sexSystem.CasterActive, !sexSystem.TargetActive, !sexSystem.CasterMale, !sexSystem.TargetMale, !sexSystem.AssistActive, !sexSystem.AssistMale]))
                         {
                             playerConfig.ActionByFlag(Weaknesses.MissionaryLesbian, () => SetWeaknesses([sexType, 9]), () => RemoveWeaknesses([sexType, 9]));
                         }
@@ -207,7 +207,7 @@ internal class PlayerWeaknessMod
 
             if (Character.statusDATA.IsBound || Character.statusDATA.IsBoundHeavyRestraint > 0)
             {
-                if (playerConfig.ActionByFlag(Weaknesses.Bondage, () => SetWeaknesses([sexType,9]), Character.statusDATA.WeaknessList.Clear))
+                if (playerConfig.ActionByFlag(Weaknesses.Bondage, () => SetWeaknesses([sexType, 9]), Character.statusDATA.WeaknessList.Clear))
                 {
                     return;
                 }

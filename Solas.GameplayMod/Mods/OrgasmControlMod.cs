@@ -181,8 +181,8 @@ internal class OrgasmControlMod
                 OrgasmControl = OrgasmControl.PunishmentOrgasm;
                 string enemyName = sexSystem.Enemy.TryGetComponentWithCast(out EnemyAI enemyAI) ? enemyAI.enemyName : "Enemy";
                 AddIcon(sexSystem, PunishmentOrgasmSprite);
-                Core.LogDebug($"{enemyName} put on Player Punishment Orgasm buff");
-                sexSystem.console.ConsoleWrite($"{enemyName} put on you Punishment Orgasm buff");
+                Core.LogDebug($"{enemyName} put on Player Spanking Orgasm buff");
+                sexSystem.console.ConsoleWrite($"{enemyName} put on you Spanking Orgasm buff");
                 return true;
             }
 
@@ -224,7 +224,7 @@ internal class OrgasmControlMod
         {
             ResetPunishmentOrgasm();
             RemoveIcon(sexSystem, PunishmentOrgasmSprite);
-            sexSystem.console.ConsoleWrite("You managed to break Punishment Orgasm!");
+            sexSystem.console.ConsoleWrite("You managed to break Spanking Orgasm!");
         }
     }
 

@@ -25,32 +25,8 @@ internal class EnemySexModel
         {
             return true;
         }
-        else if (SexTags.HasFlag(SexTag.Dominant) && sexMove.IsDominant)
-        {
-            return true;
-        }
-        else if (SexTags.HasFlag(SexTag.Sensual) && sexMove.IsSensual)
-        {
-            return true;
-        }
-        else if (SexTags.HasFlag(SexTag.Service) && sexMove.IsService)
-        {
-            return true;
-        }
-        else if (SexTags.HasFlag(SexTag.Smothering) && sexMove.IsSmothering)
-        {
-            return true;
-        }
-        else if (SexTags.HasFlag(SexTag.Wresting) && sexMove.IsWresting)
-        {
-            return true;
-        }
-        else if (SexTags.HasFlag(SexTag.Punishment) && sexMove.IsSpanking)
-        {
-            return true;
-        }
 
-        return false;
+        return (SexTags & sexMove.SexTags) != 0;
     }
 
     public override bool Equals(object obj)

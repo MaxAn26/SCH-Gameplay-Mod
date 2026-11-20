@@ -313,7 +313,7 @@ internal class EnemySexExtendMod
                 CasterWeaknesses = Weaknesses.NoWeaknesses | Weaknesses.MissionaryStyle | Weaknesses.MountingStyle,
                 TargetWeaknesses = Weaknesses.NoWeaknesses | Weaknesses.Orals | Weaknesses.BreastPlay,
                 UseTag = true,
-                SexTags = SexTag.Dominant | SexTag.Smothering | SexTag.Punishment
+                SexTags = SexTag.Dominant | SexTag.Smothering | SexTag.Spanking
             },
             new() {
                 Name = "Fighter",
@@ -324,7 +324,7 @@ internal class EnemySexExtendMod
                 CasterWeaknesses = Weaknesses.DoggyStyle | Weaknesses.MountingStyle | Weaknesses.NoWeaknesses,
                 TargetWeaknesses = Weaknesses.BreastPlay | Weaknesses.Orals | Weaknesses.FootPlay | Weaknesses.NoWeaknesses,
                 UseTag = true,
-                SexTags = SexTag.Wresting | SexTag.Dominant | SexTag.Punishment
+                SexTags = SexTag.Wresting | SexTag.Dominant | SexTag.Spanking
             },
             new() {
                 Name = "Ninja",
